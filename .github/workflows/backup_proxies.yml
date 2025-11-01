@@ -1,0 +1,80 @@
+name: 💾 Backup Proxy Data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # Daily at midnight
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+      
+    - name: Create daily backup
+      run: |
+        echo "💾 Creating daily backup..."
+        
+        # Create backup directory with date
+        BACKUP_DIR="backups/$(date +%Y-%m-%d)"
+        mkdir -p "$BACKUP_DIR"
+        
+        # Backup important files
+        if [ -f "proxies.txt" ]; then
+          cp proxies.txt "$BACKUP_DIR/"
+          echo "✅ Backed up proxies.txt"
+        else
+          echo "⚠️ proxies.txt not found"
+        fi
+        
+        if [ -f "proxies_simple.txt" ]; then
+          cp proxies_simple.txt "$BACKUP_DIR/"
+          echo "✅ Backed up proxies_simple.txt"
+        else
+          echo "⚠️ proxies_simple.txt not found"
+        fi
+        
+        if [ -f "proxies_working.txt" ]; then
+          cp proxies_working.txt "$BACKUP_DIR/"
+          echo "✅ Backed up proxies_working.txt"
+        else
+          echo "⚠️ proxies_working.txt not found"
+        fi
+        
+        if [ -f "proxies_working_simple.txt" ]; then
+          cp proxies_working_simple.txt "$BACKUP_DIR/"
+          echo "✅ Backed up proxies_working_simple.txt"
+        else
+          echo "⚠️ proxies_working_simple.txt not found"
+        fi
+        
+        if [ -f "data.js" ]; then
+          cp data.js "$BACKUP_DIR/"
+          echo "✅ Backed up data.js"
+        else
+          echo "⚠️ data.js not found"
+        fi
+        
+        if [ -f "quick_validation.txt" ]; then
+          cp quick_validation.txt "$BACKUP_DIR/"
+          echo "✅ Backed up quick_validation.txt"
+        else
+          echo "⚠️ quick_validation.txt not found"
+        fi
+        
+        echo "📁 Backup completed in $BACKUP_DIR"
+        
+    - name: Commit backup files
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add backups/
+        git commit -m "💾 Daily backup [$(date +%Y-%m-%d)]" || echo "No changes to commit"
+        git push
