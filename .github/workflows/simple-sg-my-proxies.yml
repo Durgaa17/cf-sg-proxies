@@ -1,9 +1,12 @@
-name: Simple SG/MY Proxy Update
+name: Update Singapore & Malaysia Proxies
 
 on:
   schedule:
     - cron: '0 */2 * * *'  # Every 2 hours
   workflow_dispatch:
+
+permissions:
+  contents: write  # THIS IS CRITICAL!
 
 jobs:
   update-proxies:
@@ -13,57 +16,75 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}  # Add this line!
+        token: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Fetch and filter proxies
       run: |
-        # Create header with timestamp
         echo "# 🚀 Singapore & Malaysia Proxies" > proxies.txt
         echo "# Source: FoolVPN-ID/Nautica" >> proxies.txt
-        echo "# Updated: $(date)" >> proxies.txt
+        echo "# Updated: $(date +'%Y-%m-%d %H:%M:%S')" >> proxies.txt
+        echo "# Countries: SG (Singapore), MY (Malaysia)" >> proxies.txt
         echo "" >> proxies.txt
         
-        # Fetch the CSV and filter for SG/MY
-        curl -s "https://raw.githubusercontent.com/FoolVPN-ID/Nautica/refs/heads/main/proxyList.txt" | \
-        while IFS=, read -r ip port country provider; do
-          country=$(echo "$country" | tr -d ' ' | tr '[:lower:]' '[:upper:]')
-          if [ "$country" = "SG" ] || [ "$country" = "MY" ]; then
-            echo "$ip:$port | $country | $provider"
-          fi
-        done >> proxies.txt
+        echo "🔍 Fetching proxies from source..."
+        curl -s "https://raw.githubusercontent.com/FoolVPN-ID/Nautica/refs/heads/main/proxyList.txt" > temp_proxies.csv
         
-        # Count results
-        SG_COUNT=$(grep -c "| SG |" proxies.txt || true)
-        MY_COUNT=$(grep -c "| MY |" proxies.txt || true)
+        echo "📊 Processing proxies..."
+        SG_COUNT=0
+        MY_COUNT=0
+        
+        # Process the CSV file
+        while IFS=, read -r ip port country provider; do
+          # Clean up the values
+          ip=$(echo "$ip" | xargs)
+          port=$(echo "$port" | xargs)
+          country=$(echo "$country" | xargs | tr '[:lower:]' '[:upper:]')
+          provider=$(echo "$provider" | xargs)
+          
+          if [ "$country" = "SG" ]; then
+            echo "$ip:$port | Singapore | $provider" >> proxies.txt
+            SG_COUNT=$((SG_COUNT + 1))
+          elif [ "$country" = "MY" ]; then
+            echo "$ip:$port | Malaysia | $provider" >> proxies.txt
+            MY_COUNT=$((MY_COUNT + 1))
+          fi
+        done < temp_proxies.csv
         
         echo "" >> proxies.txt
         echo "# 📊 Statistics" >> proxies.txt
-        echo "# Singapore: $SG_COUNT" >> proxies.txt
-        echo "# Malaysia: $MY_COUNT" >> proxies.txt
+        echo "# Singapore (SG): $SG_COUNT" >> proxies.txt
+        echo "# Malaysia (MY): $MY_COUNT" >> proxies.txt
         echo "# Total: $((SG_COUNT + MY_COUNT))" >> proxies.txt
+        echo "# Last Update: $(date +'%Y-%m-%d %H:%M:%S')" >> proxies.txt
         
-        echo "✅ Found $SG_COUNT SG proxies and $MY_COUNT MY proxies"
+        echo "✅ Found $SG_COUNT Singapore proxies and $MY_COUNT Malaysia proxies"
         
     - name: Create simple version
       run: |
-        echo "# Simple SG/MY Proxy List" > proxies_simple.txt
-        echo "# Updated: $(date)" >> proxies_simple.txt
-        echo "" >> proxies_simple.txt
+        echo "# Simple Singapore & Malaysia Proxy List" > proxies_simple.txt
+        echo "# Updated: $(date +'%Y-%m-%d %H:%M:%S')" >> proxies_simple.txt
+        echo "# Extract from: FoolVPN-ID/Nautica" >> proxies_simple.txt
+        echo "" >> proxies.txt
         
-        # Extract just IP:PORT for simple version
-        grep "^[0-9]" proxies.txt | cut -d'|' -f1 | sed 's/ //g' >> proxies_simple.txt
+        # Extract IP:PORT only
+        grep "| Singapore |" proxies.txt | cut -d'|' -f1 | sed 's/ //g' >> proxies_simple.txt
+        grep "| Malaysia |" proxies.txt | cut -d'|' -f1 | sed 's/ //g' >> proxies_simple.txt
+        
+        SIMPLE_COUNT=$(grep -c ":" proxies_simple.txt || true)
+        echo "📁 Simple version created with $SIMPLE_COUNT proxies"
         
     - name: Commit and push changes
       run: |
-        git config user.email "action@github.com"
-        git config user.name "GitHub Action"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        
         git add proxies.txt proxies_simple.txt
         
-        # Check if there are changes before committing
-        if git diff --staged --quiet; then
-          echo "🤷‍♂️ No changes to commit"
-        else
-          git commit -m "🔄 Update SG/MY proxies - $(date +'%H:%M')"
+        # Check if there are changes
+        if ! git diff --staged --quiet; then
+          git commit -m "🤖 Auto-update: SG/MY proxies [$(date +'%H:%M')]"
           git push
-          echo "✅ Changes committed and pushed successfully"
+          echo "✅ Successfully committed and pushed changes"
+        else
+          echo "ℹ️ No changes to commit"
         fi
