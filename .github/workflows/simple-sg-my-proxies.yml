@@ -12,7 +12,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}  # Add this line!
+        
     - name: Fetch and filter proxies
       run: |
         # Create header with timestamp
@@ -56,4 +58,12 @@ jobs:
         git config user.email "action@github.com"
         git config user.name "GitHub Action"
         git add proxies.txt proxies_simple.txt
-        git diff --cached --quiet || (git commit -m "🔄 Update SG/MY proxies - $(date +'%H:%M')" && git push)
+        
+        # Check if there are changes before committing
+        if git diff --staged --quiet; then
+          echo "🤷‍♂️ No changes to commit"
+        else
+          git commit -m "🔄 Update SG/MY proxies - $(date +'%H:%M')"
+          git push
+          echo "✅ Changes committed and pushed successfully"
+        fi
