@@ -2,8 +2,9 @@ name: 🚀 Quick Proxy Validator
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 */1 * * *'  # Every hour
+
+permissions:
+  contents: write
 
 jobs:
   quick-validate:
@@ -12,12 +13,14 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
       
     - name: Quick API test
       run: |
         echo "🔍 Quick validation of existing proxies..."
         
-        # Test only first 10 proxies from existing file
+        # Test only first 5 proxies from existing file
         if [ -f "proxies_simple.txt" ]; then
           echo "# Quick Validation Results" > quick_validation.txt
           echo "# Validated: $(date)" >> quick_validation.txt
@@ -26,26 +29,38 @@ jobs:
           count=0
           working=0
           
-          while IFS= read -r proxy && [ $count -lt 10 ]; do
+          while IFS= read -r proxy && [ $count -lt 5 ]; do
             [[ -z "$proxy" ]] && continue
             [[ "$proxy" =~ ^# ]] && continue
             
             count=$((count + 1))
-            response=$(curl -s --max-time 5 "https://cf-workers-checkproxyip.pages.dev/check?proxyip=$proxy" || echo "timeout")
+            echo "Testing proxy $count: $proxy"
             
-            if echo "$response" | grep -q -E '"status":"alive"|"working":true'; then
-              echo "✅ $proxy" >> quick_validation.txt
-              working=$((working + 1))
+            # Test proxy with timeout
+            if response=$(curl -s --max-time 8 "https://cf-workers-checkproxyip.pages.dev/check?proxyip=$proxy"); then
+              if echo "$response" | grep -q -E '"status":"alive"|"working":true|success'; then
+                echo "✅ $proxy - WORKING" >> quick_validation.txt
+                working=$((working + 1))
+                echo "✅ $proxy - Working"
+              else
+                echo "❌ $proxy - DEAD" >> quick_validation.txt
+                echo "❌ $proxy - Dead"
+              fi
             else
-              echo "❌ $proxy" >> quick_validation.txt
+              echo "❌ $proxy - TIMEOUT" >> quick_validation.txt
+              echo "❌ $proxy - Timeout"
             fi
-          done < <(grep -v '^#' proxies_simple.txt | head 10)
+            
+            sleep 0.5
+          done < <(grep -v '^#' proxies_simple.txt | head 5)
           
           echo "" >> quick_validation.txt
           echo "Working: $working/$count" >> quick_validation.txt
-          echo "✅ Quick validation completed"
+          echo "✅ Quick validation completed - $working/$count working"
         else
-          echo "⚠️ No proxies_simple.txt found"
+          echo "⚠️ No proxies_simple.txt found - creating placeholder"
+          echo "# No proxies available for validation" > quick_validation.txt
+          echo "# Checked: $(date)" >> quick_validation.txt
         fi
         
     - name: Save results
@@ -53,5 +68,5 @@ jobs:
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git add quick_validation.txt
-        git commit -m "🚀 Quick validation [$(date +%H:%M)]" || exit 0
+        git commit -m "🚀 Quick validation [$(date +%H:%M)]" || echo "No changes to commit"
         git push
