@@ -24,10 +24,10 @@ jobs:
         
         # Read current statistics
         if [ -f "stats/current-stats.json" ]; then
-          TOTAL_PROXIES=$(grep '"total_proxies":' stats/current-stats.json | sed 's/.*: //' | sed 's/,//')
-          WORKING_PROXIES=$(grep '"working_proxies":' stats/current-stats.json | sed 's/.*: //' | sed 's/,//')
-          SUCCESS_RATE=$(grep '"success_rate":' stats/current-stats.json | sed 's/.*: //' | sed 's/,//')
-          LAST_UPDATED=$(grep '"last_updated":' stats/current-stats.json | sed 's/.*: "//' | sed 's/",//')
+          TOTAL_PROXIES=$(grep '"total_proxies":' stats/current-stats.json | cut -d':' -f2 | tr -d ' ,')
+          WORKING_PROXIES=$(grep '"working_proxies":' stats/current-stats.json | cut -d':' -f2 | tr -d ' ,')
+          SUCCESS_RATE=$(grep '"success_rate":' stats/current-stats.json | cut -d':' -f2 | tr -d ' ,')
+          LAST_UPDATED=$(grep '"last_updated":' stats/current-stats.json | cut -d'"' -f4)
         else
           TOTAL_PROXIES=0
           WORKING_PROXIES=0
@@ -43,14 +43,14 @@ jobs:
           STATUS_COLOR="green"
           STATUS="Excellent"
         elif [ $SUCCESS_RATE -ge 40 ]; then
-          STATUS_COLOR="orange"
+          STATUS_COLOR="orange" 
           STATUS="Good"
         else
           STATUS_COLOR="red"
           STATUS="Poor"
         fi
         
-        # Create dashboard.html
+        # Create dashboard.html with simple echo commands
         echo "<!DOCTYPE html>" > dashboard.html
         echo "<html lang='en'>" >> dashboard.html
         echo "<head>" >> dashboard.html
@@ -66,9 +66,9 @@ jobs:
         echo "        .stat-number { font-size: 2em; font-weight: bold; margin: 10px 0; }" >> dashboard.html
         echo "        .stat-label { color: #666; font-size: 0.9em; }" >> dashboard.html
         echo "        .status-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; color: white; font-weight: bold; }" >> dashboard.html
-        echo "        .status-excellent { background: #28a745; }" >> dashboard.html
-        echo "        .status-good { background: #ffc107; color: black; }" >> dashboard.html
-        echo "        .status-poor { background: #dc3545; }" >> dashboard.html
+        echo "        .status-green { background: #28a745; }" >> dashboard.html
+        echo "        .status-orange { background: #ffc107; color: black; }" >> dashboard.html
+        echo "        .status-red { background: #dc3545; }" >> dashboard.html
         echo "        .last-updated { text-align: center; color: #666; margin-top: 20px; }" >> dashboard.html
         echo "        .countries { display: flex; justify-content: center; gap: 20px; margin: 20px 0; }" >> dashboard.html
         echo "        .country-flag { font-size: 2em; }" >> dashboard.html
