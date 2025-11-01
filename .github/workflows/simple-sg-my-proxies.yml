@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # THIS IS CRITICAL!
+  contents: write
 
 jobs:
   update-proxies:
@@ -18,60 +18,74 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         
-    - name: Fetch and filter proxies
+    - name: Fetch and process proxies
       run: |
-        echo "# 🚀 Singapore & Malaysia Proxies" > proxies.txt
-        echo "# Source: FoolVPN-ID/Nautica" >> proxies.txt
-        echo "# Updated: $(date +'%Y-%m-%d %H:%M:%S')" >> proxies.txt
-        echo "# Countries: SG (Singapore), MY (Malaysia)" >> proxies.txt
-        echo "" >> proxies.txt
+        echo "🔍 Downloading proxy list..."
+        curl -s "https://raw.githubusercontent.com/FoolVPN-ID/Nautica/refs/heads/main/proxyList.txt" -o proxy_list.csv
         
-        echo "🔍 Fetching proxies from source..."
-        curl -s "https://raw.githubusercontent.com/FoolVPN-ID/Nautica/refs/heads/main/proxyList.txt" > temp_proxies.csv
+        echo "📊 Creating proxy files..."
         
-        echo "📊 Processing proxies..."
+        # Create the main proxy file with header
+        cat > proxies.txt << 'EOF'
+# 🚀 Singapore & Malaysia Proxies
+# Source: FoolVPN-ID/Nautica
+# Updated: $(date)
+# Countries: SG (Singapore), MY (Malaysia)
+
+EOF
+
+        # Process the CSV file safely
         SG_COUNT=0
         MY_COUNT=0
         
-        # Process the CSV file
-        while IFS=, read -r ip port country provider; do
-          # Clean up the values
-          ip=$(echo "$ip" | xargs)
-          port=$(echo "$port" | xargs)
-          country=$(echo "$country" | xargs | tr '[:lower:]' '[:upper:]')
-          provider=$(echo "$provider" | xargs)
+        while IFS= read -r line; do
+          # Skip empty lines
+          [[ -z "$line" ]] && continue
           
-          if [ "$country" = "SG" ]; then
+          # Split by comma
+          IFS=, read -r ip port country provider <<< "$line"
+          
+          # Clean and uppercase country code
+          country_clean=$(echo "$country" | tr '[:lower:]' '[:upper:]' | tr -d ' ' | tr -d '"')
+          
+          if [ "$country_clean" = "SG" ]; then
             echo "$ip:$port | Singapore | $provider" >> proxies.txt
             SG_COUNT=$((SG_COUNT + 1))
-          elif [ "$country" = "MY" ]; then
+          elif [ "$country_clean" = "MY" ]; then
             echo "$ip:$port | Malaysia | $provider" >> proxies.txt
             MY_COUNT=$((MY_COUNT + 1))
           fi
-        done < temp_proxies.csv
+        done < proxy_list.csv
         
-        echo "" >> proxies.txt
-        echo "# 📊 Statistics" >> proxies.txt
-        echo "# Singapore (SG): $SG_COUNT" >> proxies.txt
-        echo "# Malaysia (MY): $MY_COUNT" >> proxies.txt
-        echo "# Total: $((SG_COUNT + MY_COUNT))" >> proxies.txt
-        echo "# Last Update: $(date +'%Y-%m-%d %H:%M:%S')" >> proxies.txt
-        
+        # Add statistics
+        cat >> proxies.txt << EOF
+
+# 📊 Statistics
+# Singapore (SG): $SG_COUNT
+# Malaysia (MY): $MY_COUNT
+# Total Proxies: $((SG_COUNT + MY_COUNT))
+# Last Update: $(date)
+EOF
+
         echo "✅ Found $SG_COUNT Singapore proxies and $MY_COUNT Malaysia proxies"
         
     - name: Create simple version
       run: |
-        echo "# Simple Singapore & Malaysia Proxy List" > proxies_simple.txt
-        echo "# Updated: $(date +'%Y-%m-%d %H:%M:%S')" >> proxies_simple.txt
-        echo "# Extract from: FoolVPN-ID/Nautica" >> proxies_simple.txt
-        echo "" >> proxies.txt
+        echo "📁 Creating simple version..."
         
-        # Extract IP:PORT only
-        grep "| Singapore |" proxies.txt | cut -d'|' -f1 | sed 's/ //g' >> proxies_simple.txt
-        grep "| Malaysia |" proxies.txt | cut -d'|' -f1 | sed 's/ //g' >> proxies_simple.txt
+        cat > proxies_simple.txt << 'EOF'
+# Simple Singapore & Malaysia Proxy List
+# Source: FoolVPN-ID/Nautica
+# Updated: $(date)
+# Format: IP:PORT
+
+EOF
+
+        # Extract just IP:PORT from the main file
+        grep -E '^[0-9]' proxies.txt | cut -d'|' -f1 | sed 's/ //g' >> proxies_simple.txt
         
-        SIMPLE_COUNT=$(grep -c ":" proxies_simple.txt || true)
-        echo "📁 Simple version created with $SIMPLE_COUNT proxies"
+        SIMPLE_COUNT=$(grep -c '^[0-9]' proxies_simple.txt || true)
+        echo "📄 Simple version has $SIMPLE_COUNT proxies"
         
     - name: Commit and push changes
       run: |
@@ -80,11 +94,10 @@ jobs:
         
         git add proxies.txt proxies_simple.txt
         
-        # Check if there are changes
         if ! git diff --staged --quiet; then
           git commit -m "🤖 Auto-update: SG/MY proxies [$(date +'%H:%M')]"
           git push
-          echo "✅ Successfully committed and pushed changes"
+          echo "✅ Changes committed successfully"
         else
           echo "ℹ️ No changes to commit"
         fi
