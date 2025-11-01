@@ -53,7 +53,7 @@ jobs:
             fi
             
             sleep 0.5
-          done < <(grep -v '^#' proxies_simple.txt | head -5)  # FIXED: head -5
+          done < <(grep -v '^#' proxies_simple.txt | grep ':')  # FIXED: head -5
           
           echo "" >> quick_validation.txt
           echo "Working: $working/$count" >> quick_validation.txt
