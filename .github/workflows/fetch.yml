@@ -15,17 +15,7 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
       
-    - name: Install Python and dependencies
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-        
-    - name: Install required packages
-      run: pip install requests
-        
     - name: Download and process proxies
       run: |
         # Download the proxy list
@@ -138,79 +128,10 @@ jobs:
         
         echo "✅ Found $WORKING working proxies out of $TOTAL using API"
         
-    - name: Update data.js with latest proxies
-      run: |
-        echo "📁 Updating data.js with latest proxies..."
-        
-        # Count proxies
-        TOTAL=$(grep -c '^[0-9]' proxies_simple.txt || echo 0)
-        WORKING=$(grep -c '^[0-9]' proxies_working_simple.txt || echo 0)
-        if [ $TOTAL -gt 0 ]; then
-          SUCCESS_RATE=$((WORKING * 100 / TOTAL))
-        else
-          SUCCESS_RATE=0
-        fi
-        
-        # Get some Singapore proxies (first 10)
-        SG_PROXIES=$(grep '^[0-9]' proxies_simple.txt | head -10 | sed 's/^/        "/; s/$/",/' | tr '\n' ' ')
-        
-        # Get some Malaysia proxies (next 10)  
-        MY_PROXIES=$(grep '^[0-9]' proxies_simple.txt | head -20 | tail -10 | sed 's/^/        "/; s/$/",/' | tr '\n' ' ')
-        
-        # Get working proxies with response times
-        WORKING_PROXIES=$(grep '^[0-9]' proxies_working.txt | head -5 | sed 's/ | /", "responseTime": /; s/ms//; s/^/        { "proxy": "/; s/$/" },/' | tr '\n' ' ')
-        
-        # Create data.js file
-        cat > data.js << EOF
-// data.js - Proxy Data Storage
-// Auto-updated by GitHub Actions every 2 hours
-
-const proxyData = {
-    lastUpdated: "$(date -Iseconds)",
-    countries: ['SG', 'MY'],
-    
-    // Singapore Proxies
-    sg: [
-${SG_PROXIES}
-    ],
-    
-    // Malaysia Proxies  
-    my: [
-${MY_PROXIES}
-    ],
-    
-    // Working proxies (from API validation)
-    working: [
-${WORKING_PROXIES}
-    ],
-    
-    // Statistics
-    stats: {
-        totalProxies: $TOTAL,
-        workingProxies: $WORKING,
-        successRate: $SUCCESS_RATE,
-        lastValidation: "$(date -Iseconds)"
-    }
-};
-
-// Make it available globally
-if (typeof window !== 'undefined') {
-    window.proxyData = proxyData;
-}
-
-// For Node.js/Server environments
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = proxyData;
-}
-EOF
-        
-        echo "✅ data.js updated with latest proxies"
-        echo "📊 Stats: Total: $TOTAL, Working: $WORKING, Success: ${SUCCESS_RATE}%"
-      
     - name: Commit changes
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add proxies.txt proxies_simple.txt proxies_working.txt proxies_working_simple.txt data.js
-        git commit -m "🤖 Update: SG/MY proxies + API validation + data.js [$(date +%H:%M)]" || exit 0
+        git add proxies.txt proxies_simple.txt proxies_working.txt proxies_working_simple.txt
+        git commit -m "🤖 Update: SG/MY proxies + API validation [$(date +%H:%M)]" || exit 0
         git push
