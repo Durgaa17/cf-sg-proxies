@@ -1,0 +1,57 @@
+name: 🚀 Quick Proxy Validator
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */1 * * *'  # Every hour
+
+jobs:
+  quick-validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Quick API test
+      run: |
+        echo "🔍 Quick validation of existing proxies..."
+        
+        # Test only first 10 proxies from existing file
+        if [ -f "proxies_simple.txt" ]; then
+          echo "# Quick Validation Results" > quick_validation.txt
+          echo "# Validated: $(date)" >> quick_validation.txt
+          echo "" >> quick_validation.txt
+          
+          count=0
+          working=0
+          
+          while IFS= read -r proxy && [ $count -lt 10 ]; do
+            [[ -z "$proxy" ]] && continue
+            [[ "$proxy" =~ ^# ]] && continue
+            
+            count=$((count + 1))
+            response=$(curl -s --max-time 5 "https://cf-workers-checkproxyip.pages.dev/check?proxyip=$proxy" || echo "timeout")
+            
+            if echo "$response" | grep -q -E '"status":"alive"|"working":true'; then
+              echo "✅ $proxy" >> quick_validation.txt
+              working=$((working + 1))
+            else
+              echo "❌ $proxy" >> quick_validation.txt
+            fi
+          done < <(grep -v '^#' proxies_simple.txt | head 10)
+          
+          echo "" >> quick_validation.txt
+          echo "Working: $working/$count" >> quick_validation.txt
+          echo "✅ Quick validation completed"
+        else
+          echo "⚠️ No proxies_simple.txt found"
+        fi
+        
+    - name: Save results
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add quick_validation.txt
+        git commit -m "🚀 Quick validation [$(date +%H:%M)]" || exit 0
+        git push
