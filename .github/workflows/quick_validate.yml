@@ -29,6 +29,7 @@ jobs:
           count=0
           working=0
           
+          # FIX: Use head -5 instead of head 5
           while IFS= read -r proxy && [ $count -lt 5 ]; do
             [[ -z "$proxy" ]] && continue
             [[ "$proxy" =~ ^# ]] && continue
@@ -52,7 +53,7 @@ jobs:
             fi
             
             sleep 0.5
-          done < <(grep -v '^#' proxies_simple.txt | head 5)
+          done < <(grep -v '^#' proxies_simple.txt | head -5)  # FIXED: head -5
           
           echo "" >> quick_validation.txt
           echo "Working: $working/$count" >> quick_validation.txt
