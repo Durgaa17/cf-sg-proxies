@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SG/MY Proxy Server</title>
+    <script src="data.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .endpoint { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        button { background: #007acc; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #005a9e; }
+        .result { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #007acc; }
+        .proxy-item { padding: 5px 0; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Singapore & Malaysia Proxy Server</h1>
+    <p>Simple proxy list API and validation service</p>
+    
+    <div id="stats"></div>
+
+    <h2>📡 API Endpoints</h2>
+    
+    <div class="endpoint">
+        <h3>Get All Proxies</h3>
+        <code>GET /?action=proxies&country=SG</code><br><br>
+        <button onclick="getProxies('SG')">Get SG Proxies</button>
+        <button onclick="getProxies('MY')">Get MY Proxies</button>
+        <button onclick="getProxies('all')">Get All Proxies</button>
+    </div>
+
+    <div class="endpoint">
+        <h3>Get Working Proxies</h3>
+        <code>GET /?action=working</code><br><br>
+        <button onclick="getWorkingProxies()">Get Working Proxies</button>
+    </div>
+
+    <div class="endpoint">
+        <h3>Check Proxy (Validation)</h3>
+        <code>GET /?action=check&proxy=IP:PORT</code><br><br>
+        <input type="text" id="proxyToCheck" placeholder="13.250.131.37:443" style="padding: 5px; width: 200px;">
+        <button onclick="checkProxy()">Check Proxy</button>
+    </div>
+
+    <div class="endpoint">
+        <h3>Get Random Proxy</h3>
+        <code>GET /?action=random&country=SG</code><br><br>
+        <button onclick="getRandomProxy('SG')">Random SG</button>
+        <button onclick="getRandomProxy('MY')">Random MY</button>
+        <button onclick="getRandomProxy()">Random Any</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        // Display statistics
+        function showStats() {
+            document.getElementById('stats').innerHTML = `
+                <div style="background: #e8f4fd; padding: 15px; border-radius: 5px;">
+                    <strong>📊 Statistics</strong><br>
+                    Total Proxies: ${proxyData.stats.totalProxies}<br>
+                    Working Proxies: ${proxyData.stats.workingProxies}<br>
+                    Success Rate: ${proxyData.stats.successRate}%<br>
+                    Last Updated: ${new Date(proxyData.lastUpdated).toLocaleString()}
+                </div>
+            `;
+        }
+
+        // API Functions
+        function getProxies(country) {
+            let proxies = [];
+            if (country === 'SG' || country === 'all') proxies = proxies.concat(proxyData.sg);
+            if (country === 'MY' || country === 'all') proxies = proxies.concat(proxyData.my);
+            
+            showResult('All Proxies (' + country + ')', proxies);
+            
+            // Also show as JSON API response
+            const apiResponse = {
+                action: 'proxies',
+                country: country,
+                proxies: proxies,
+                count: proxies.length,
+                timestamp: new Date().toISOString()
+            };
+            console.log('API Response:', apiResponse);
+        }
+
+        function getWorkingProxies() {
+            showResult('Working Proxies', proxyData.working);
+            
+            const apiResponse = {
+                action: 'working',
+                proxies: proxyData.working,
+                count: proxyData.working.length,
+                timestamp: new Date().toISOString()
+            };
+            console.log('API Response:', apiResponse);
+        }
+
+        function checkProxy() {
+            const proxy = document.getElementById('proxyToCheck').value;
+            if (!proxy) {
+                alert('Please enter a proxy (IP:PORT)');
+                return;
+            }
+
+            // Simulate API validation (in real setup, this would call your validation API)
+            showResult('Checking Proxy...', `Testing: ${proxy}`);
+            
+            // Simulate API call to your validation service
+            setTimeout(() => {
+                const isWorking = Math.random() > 0.3; // 70% chance of working for demo
+                const responseTime = Math.floor(Math.random() * 500) + 50;
+                
+                const result = {
+                    proxy: proxy,
+                    status: isWorking ? 'alive' : 'dead',
+                    responseTime: isWorking ? responseTime : 0,
+                    checkedAt: new Date().toISOString()
+                };
+                
+                showResult('Proxy Check Result', result);
+                
+                // API Response
+                const apiResponse = {
+                    action: 'check',
+                    proxy: proxy,
+                    result: result,
+                    timestamp: new Date().toISOString()
+                };
+                console.log('API Response:', apiResponse);
+            }, 1000);
+        }
+
+        function getRandomProxy(country) {
+            let pool = [];
+            if (country === 'SG') pool = proxyData.sg;
+            else if (country === 'MY') pool = proxyData.my;
+            else pool = [...proxyData.sg, ...proxyData.my];
+            
+            if (pool.length === 0) {
+                showResult('Error', 'No proxies available for selected country');
+                return;
+            }
+            
+            const randomProxy = pool[Math.floor(Math.random() * pool.length)];
+            const result = {
+                proxy: randomProxy,
+                country: proxyData.sg.includes(randomProxy) ? 'SG' : 'MY',
+                timestamp: new Date().toISOString()
+            };
+            
+            showResult('Random Proxy', result);
+            
+            const apiResponse = {
+                action: 'random',
+                country: country,
+                result: result,
+                timestamp: new Date().toISOString()
+            };
+            console.log('API Response:', apiResponse);
+        }
+
+        function showResult(title, data) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="result">
+                    <h3>${title}</h3>
+                    <pre>${typeof data === 'string' ? data : JSON.stringify(data, null, 2)}</pre>
+                </div>
+            `;
+        }
+
+        // Initialize
+        showStats();
+        
+        // Handle URL parameters for API calls
+        const urlParams = new URLSearchParams(window.location.search);
+        const action = urlParams.get('action');
+        const country = urlParams.get('country');
+        const proxy = urlParams.get('proxy');
+        
+        if (action === 'proxies' && country) {
+            getProxies(country);
+        } else if (action === 'working') {
+            getWorkingProxies();
+        } else if (action === 'check' && proxy) {
+            document.getElementById('proxyToCheck').value = proxy;
+            checkProxy();
+        } else if (action === 'random') {
+            getRandomProxy(country || 'all');
+        }
+    </script>
+</body>
+</html>
