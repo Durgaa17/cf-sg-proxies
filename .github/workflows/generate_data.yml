@@ -1,9 +1,9 @@
 name: 📊 Generate Data File
 
 on:
- schedule:
-    - cron: '15 */2 * * *'  # Every 2 hours at minute 15
   workflow_dispatch:
+  schedule:
+    - cron: '15 */2 * * *'  # Every 2 hours at minute 15
 
 permissions:
   contents: write
