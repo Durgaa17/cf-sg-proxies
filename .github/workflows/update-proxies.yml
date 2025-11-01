@@ -1,0 +1,41 @@
+- name: Validate proxies with API (Bash)
+  run: |
+    echo "🔍 Validating proxies using API..."
+    echo "# 🟢 WORKING Proxies (API Validated)" > proxies_working.txt
+    echo "# API: cf-workers-checkproxyip.pages.dev" >> proxies_working.txt
+    echo "# Validated: $(date)" >> proxies_working.txt
+    echo "" >> proxies_working.txt
+    
+    TOTAL=0
+    WORKING=0
+    
+    # Test each proxy using your API
+    while IFS= read -r proxy; do
+      [[ -z "$proxy" ]] && continue
+      [[ "$proxy" =~ ^# ]] && continue
+      
+      TOTAL=$((TOTAL + 1))
+      echo "Testing [$TOTAL]: $proxy"
+      
+      start_time=$(date +%s%3N)
+      API_RESPONSE=$(curl -s --max-time 10 "https://cf-workers-checkproxyip.pages.dev/check?proxyip=$proxy" || echo "ERROR")
+      end_time=$(date +%s%3N)
+      response_time=$((end_time - start_time))
+      
+      # Check if API response indicates working proxy
+      if echo "$API_RESPONSE" | grep -q '"status":"alive"' || echo "$API_RESPONSE" | grep -q '"working":true'; then
+        echo "$proxy | ${response_time}ms" >> proxies_working.txt
+        WORKING=$((WORKING + 1))
+        echo "✅ $proxy - ${response_time}ms"
+      else
+        echo "❌ $proxy - Failed"
+      fi
+      
+      # Small delay to be nice to the API
+      sleep 0.5
+      
+    done < proxies_simple.txt
+    
+    echo "" >> proxies_working.txt
+    echo "# 📊 Stats: $WORKING/$TOTAL working" >> proxies_working.txt
+    echo "✅ Found $WORKING working proxies out of $TOTAL using API"
