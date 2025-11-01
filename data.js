@@ -1,46 +1,18 @@
-// data.js - Proxy Data Storage
-// Auto-updated by GitHub Actions every 2 hours
+// Proxy Data - Auto-generated
+// Updated: Sat Nov  1 22:38:48 UTC 2025
 
 const proxyData = {
-    lastUpdated: new Date().toISOString(),
-    countries: ['SG', 'MY'],
-    
-    // Singapore Proxies
-    sg: [
-        "13.250.131.37:443",
-        "54.255.185.94:443", 
-        "52.77.225.242:443"
-    ],
-    
-    // Malaysia Proxies
-    my: [
-        "13.76.157.24:443",
-        "52.77.225.242:443",
-        "13.250.131.37:443"
-    ],
-    
-    // Working proxies with response times (from API validation)
-    working: [
-        { proxy: "13.250.131.37:443", responseTime: 120, country: "SG" },
-        { proxy: "54.255.185.94:443", responseTime: 180, country: "SG" },
-        { proxy: "52.77.225.242:443", responseTime: 220, country: "MY" }
-    ],
-    
-    // Statistics
-    stats: {
-        totalProxies: 150,
-        workingProxies: 45,
-        successRate: 30,
-        lastValidation: new Date().toISOString()
-    }
+    lastUpdated: "2025-11-01T22:38:48+00:00",
+    statistics: {
+        totalProxies: 54,
+        workingProxies: 54,
+        successRate: 100,
+        lastValidation: "2025-11-01T22:38:48+00:00"
+    },
+    sampleProxies: ["47.74.254.191:8900","129.150.58.86:57621","146.235.18.248:45137","138.2.89.238:43254","213.35.108.135:12596","],
+    countries: ["SG", "MY"]
 };
 
-// Make it available globally
-if (typeof window !== 'undefined') {
-    window.proxyData = proxyData;
-}
-
-// For Node.js/Server environments
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = proxyData;
-      }
+// Export for different environments
+if (typeof window !== 'undefined') window.proxyData = proxyData;
+if (typeof module !== 'undefined' && module.exports) module.exports = proxyData;
