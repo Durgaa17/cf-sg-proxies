@@ -1,1 +1,59 @@
+name: Simple SG/MY Proxy Update
 
+on:
+  schedule:
+    - cron: '0 */2 * * *'  # Every 2 hours
+  workflow_dispatch:
+
+jobs:
+  update-proxies:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Fetch and filter proxies
+      run: |
+        # Create header with timestamp
+        echo "# 🚀 Singapore & Malaysia Proxies" > proxies.txt
+        echo "# Source: FoolVPN-ID/Nautica" >> proxies.txt
+        echo "# Updated: $(date)" >> proxies.txt
+        echo "" >> proxies.txt
+        
+        # Fetch the CSV and filter for SG/MY
+        curl -s "https://raw.githubusercontent.com/FoolVPN-ID/Nautica/refs/heads/main/proxyList.txt" | \
+        while IFS=, read -r ip port country provider; do
+          country=$(echo "$country" | tr -d ' ' | tr '[:lower:]' '[:upper:]')
+          if [ "$country" = "SG" ] || [ "$country" = "MY" ]; then
+            echo "$ip:$port | $country | $provider"
+          fi
+        done >> proxies.txt
+        
+        # Count results
+        SG_COUNT=$(grep -c "| SG |" proxies.txt || true)
+        MY_COUNT=$(grep -c "| MY |" proxies.txt || true)
+        
+        echo "" >> proxies.txt
+        echo "# 📊 Statistics" >> proxies.txt
+        echo "# Singapore: $SG_COUNT" >> proxies.txt
+        echo "# Malaysia: $MY_COUNT" >> proxies.txt
+        echo "# Total: $((SG_COUNT + MY_COUNT))" >> proxies.txt
+        
+        echo "✅ Found $SG_COUNT SG proxies and $MY_COUNT MY proxies"
+        
+    - name: Create simple version
+      run: |
+        echo "# Simple SG/MY Proxy List" > proxies_simple.txt
+        echo "# Updated: $(date)" >> proxies_simple.txt
+        echo "" >> proxies_simple.txt
+        
+        # Extract just IP:PORT for simple version
+        grep "^[0-9]" proxies.txt | cut -d'|' -f1 | sed 's/ //g' >> proxies_simple.txt
+        
+    - name: Commit and push changes
+      run: |
+        git config user.email "action@github.com"
+        git config user.name "GitHub Action"
+        git add proxies.txt proxies_simple.txt
+        git diff --cached --quiet || (git commit -m "🔄 Update SG/MY proxies - $(date +'%H:%M')" && git push)
