@@ -15,6 +15,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history
       
     - name: Install Python and dependencies
       uses: actions/setup-python@v4
@@ -30,7 +32,7 @@ jobs:
       run: |
         set -e
         echo "📥 Downloading proxy list..."
-        wget -q -O proxy_list.csv "https://raw.githubusercontent.com/FoolVPN-ID/Nautica/refs/heads/main/proxyList.txt"
+        wget -q -O proxy_list.csv "https://raw.githubusercontent.com/FoolVPN-ID/Nautica/refs/heads/main/proxyList.txt" || echo "Download failed, continuing..."
         
         # Create proxies.txt
         echo "# Singapore & Malaysia Proxies" > proxies.txt
@@ -39,34 +41,52 @@ jobs:
         echo "" >> proxies.txt
         
         # Filter for SG and MY
-        echo "# 🇸🇬 Singapore Proxies (SG)" >> proxies.txt
-        grep ",SG," proxy_list.csv | head -20 | sed 's/,/ : /g' | sed 's/,SG,/: Singapore |/g' >> proxies.txt
-        echo "" >> proxies.txt
-        
-        echo "# 🇲🇾 Malaysia Proxies (MY)" >> proxies.txt
-        grep ",MY," proxy_list.csv | head -20 | sed 's/,/ : /g' | sed 's/,MY,/: Malaysia |/g' >> proxies.txt
-        echo "" >> proxies.txt
-        
-        SG_COUNT=$(grep -c ",SG," proxy_list.csv || echo 0)
-        MY_COUNT=$(grep -c ",MY," proxy_list.csv || echo 0)
-        echo "✅ Processed $SG_COUNT SG proxies and $MY_COUNT MY proxies"
+        if [ -f "proxy_list.csv" ] && [ -s "proxy_list.csv" ]; then
+          echo "# 🇸🇬 Singapore Proxies (SG)" >> proxies.txt
+          grep ",SG," proxy_list.csv | head -10 | sed 's/,/ : /g' | sed 's/,SG,/: Singapore |/g' >> proxies.txt
+          echo "" >> proxies.txt
+          
+          echo "# 🇲🇾 Malaysia Proxies (MY)" >> proxies.txt
+          grep ",MY," proxy_list.csv | head -10 | sed 's/,/ : /g' | sed 's/,MY,/: Malaysia |/g' >> proxies.txt
+          echo "" >> proxies.txt
+          
+          SG_COUNT=$(grep -c ",SG," proxy_list.csv || echo 0)
+          MY_COUNT=$(grep -c ",MY," proxy_list.csv || echo 0)
+          echo "✅ Processed $SG_COUNT SG proxies and $MY_COUNT MY proxies"
+        else
+          echo "# No proxy data available" >> proxies.txt
+          echo "⚠️ No proxy data found"
+        fi
         
     - name: Create simple list
       run: |
         echo "# Simple Proxy List" > proxies_simple.txt
         echo "# Updated: $(date)" >> proxies_simple.txt
         echo "" >> proxies_simple.txt
-        awk -F, '/,SG,|,MY,/ {print $1 ":" $2}' proxy_list.csv | head -30 >> proxies_simple.txt
         
-    - name: Test API connection
-      run: |
-        echo "🔧 Testing API connectivity..."
-        curl -s --max-time 10 "https://cf-workers-checkproxyip.pages.dev/" || echo "API test completed"
+        if [ -f "proxy_list.csv" ] && [ -s "proxy_list.csv" ]; then
+          awk -F, '/,SG,|,MY,/ {print $1 ":" $2}' proxy_list.csv | head -20 >> proxies_simple.txt
+          echo "📄 Created proxies_simple.txt"
+        else
+          echo "# No proxies available" >> proxies_simple.txt
+          echo "📄 Created empty proxies_simple.txt"
+        fi
         
-    - name: Commit and push changes
+    - name: Pull latest changes before push
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
+        git pull origin main --rebase
+        
+    - name: Commit and push changes
+      run: |
         git add proxies.txt proxies_simple.txt
-        git diff --staged --quiet || git commit -m "🤖 Update: SG/MY proxies [$(date +%H:%M)]"
-        git push
+        
+        # Check if there are changes to commit
+        if git diff --staged --quiet; then
+          echo "🤷‍♂️ No changes to commit"
+          exit 0
+        fi
+        
+        git commit -m "🤖 Auto-update: SG/MY proxies [$(date +%Y-%m-%d %H:%M)]"
+        git push origin main
