@@ -1,0 +1,69 @@
+name: 📈 Generate Statistics
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '45 */2 * * *'  # Every 2 hours at :45
+
+permissions:
+  contents: write
+
+jobs:
+  generate-stats:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+      
+    - name: Generate statistics
+      run: |
+        echo "📈 Generating proxy statistics..."
+        
+        # Get current counts
+        if [ -f "proxies_simple.txt" ]; then
+          TOTAL_COUNT=$(grep -c '^[0-9]' proxies_simple.txt 2>/dev/null || echo 0)
+        else
+          TOTAL_COUNT=0
+        fi
+        
+        if [ -f "proxies_working_simple.txt" ]; then
+          WORKING_COUNT=$(grep -c '^[0-9]' proxies_working_simple.txt 2>/dev/null || echo 0)
+        else
+          WORKING_COUNT=0
+        fi
+        
+        # Calculate success rate
+        if [ $TOTAL_COUNT -gt 0 ]; then
+          SUCCESS_RATE=$((WORKING_COUNT * 100 / TOTAL_COUNT))
+        else
+          SUCCESS_RATE=0
+        fi
+        
+        # Get timestamp
+        TIMESTAMP=$(date -Iseconds)
+        DATE=$(date +%Y-%m-%d)
+        HOUR=$(date +%H:%M)
+        
+        # Create stats directory if not exists
+        mkdir -p stats
+        
+        # Append to daily stats file
+        echo "{\"timestamp\": \"$TIMESTAMP\", \"total\": $TOTAL_COUNT, \"working\": $WORKING_COUNT, \"success_rate\": $SUCCESS_RATE, \"hour\": \"$HOUR\"}" >> stats/daily-stats.json
+        
+        # Create current stats snapshot
+        echo "{" > stats/current-stats.json
+        echo "  \"last_updated\": \"$TIMESTAMP\"," >> stats/current-stats.json
+        echo "  \"total_proxies\": $TOTAL_COUNT," >> stats/current-stats.json
+        echo "  \"working_proxies\": $WORKING_COUNT," >> stats/current-stats.json
+        echo "  \"success_rate\": $SUCCESS_RATE," >> stats/current-stats.json
+        echo "  \"failed_proxies\": $((TOTAL_COUNT - WORKING_COUNT))," >> stats/current-stats.json
+        echo "  \"countries\": [\"SG\", \"MY\"]," >> stats/current-stats.json
+        echo "  \"update_frequency\": \"2 hours\"" >> stats/current-stats.json
+        echo "}" >> stats/current-stats.json
+        
+        echo "✅ Statistics generated:"
+        echo "   - Total: $TOTAL_COUNT"
+        echo "   - Working:
