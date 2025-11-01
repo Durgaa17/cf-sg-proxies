@@ -27,54 +27,28 @@ jobs:
         mkdir -p "$BACKUP_DIR"
         
         # Backup important files
-        if [ -f "proxies.txt" ]; then
-          cp proxies.txt "$BACKUP_DIR/"
-          echo "✅ Backed up proxies.txt"
-        else
-          echo "⚠️ proxies.txt not found"
-        fi
-        
-        if [ -f "proxies_simple.txt" ]; then
-          cp proxies_simple.txt "$BACKUP_DIR/"
-          echo "✅ Backed up proxies_simple.txt"
-        else
-          echo "⚠️ proxies_simple.txt not found"
-        fi
-        
-        if [ -f "proxies_working.txt" ]; then
-          cp proxies_working.txt "$BACKUP_DIR/"
-          echo "✅ Backed up proxies_working.txt"
-        else
-          echo "⚠️ proxies_working.txt not found"
-        fi
-        
-        if [ -f "proxies_working_simple.txt" ]; then
-          cp proxies_working_simple.txt "$BACKUP_DIR/"
-          echo "✅ Backed up proxies_working_simple.txt"
-        else
-          echo "⚠️ proxies_working_simple.txt not found"
-        fi
-        
-        if [ -f "data.js" ]; then
-          cp data.js "$BACKUP_DIR/"
-          echo "✅ Backed up data.js"
-        else
-          echo "⚠️ data.js not found"
-        fi
-        
-        if [ -f "quick_validation.txt" ]; then
-          cp quick_validation.txt "$BACKUP_DIR/"
-          echo "✅ Backed up quick_validation.txt"
-        else
-          echo "⚠️ quick_validation.txt not found"
-        fi
+        for file in proxies.txt proxies_simple.txt proxies_working.txt proxies_working_simple.txt data.js quick_validation.txt; do
+          if [ -f "$file" ]; then
+            cp "$file" "$BACKUP_DIR/"
+            echo "✅ Backed up $file"
+          else
+            echo "⚠️ $file not found"
+          fi
+        done
         
         echo "📁 Backup completed in $BACKUP_DIR"
+        
+    - name: Clean old backups (keep 3 days)
+      run: |
+        echo "🧹 Cleaning backups older than 3 days..."
+        # Remove backups older than 3 days
+        find backups/ -name "20*" -type d 2>/dev/null | sort -r | tail -n +4 | xargs rm -rf 2>/dev/null || true
+        echo "✅ Kept only last 3 days of backups"
         
     - name: Commit backup files
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git add backups/
-        git commit -m "💾 Daily backup [$(date +%Y-%m-%d)]" || echo "No changes to commit"
+        git commit -m "💾 Daily backup + cleanup [$(date +%Y-%m-%d)]" || echo "No changes to commit"
         git push
