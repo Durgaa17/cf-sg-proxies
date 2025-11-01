@@ -1,41 +1,137 @@
-- name: Validate proxies with API (Bash)
-  run: |
-    echo "🔍 Validating proxies using API..."
-    echo "# 🟢 WORKING Proxies (API Validated)" > proxies_working.txt
-    echo "# API: cf-workers-checkproxyip.pages.dev" >> proxies_working.txt
-    echo "# Validated: $(date)" >> proxies_working.txt
-    echo "" >> proxies_working.txt
+name: Update and Validate SG/MY Proxies
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'  # Every 2 hours
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-proxies:
+    runs-on: ubuntu-latest
     
-    TOTAL=0
-    WORKING=0
-    
-    # Test each proxy using your API
-    while IFS= read -r proxy; do
-      [[ -z "$proxy" ]] && continue
-      [[ "$proxy" =~ ^# ]] && continue
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
       
-      TOTAL=$((TOTAL + 1))
-      echo "Testing [$TOTAL]: $proxy"
-      
-      start_time=$(date +%s%3N)
-      API_RESPONSE=$(curl -s --max-time 10 "https://cf-workers-checkproxyip.pages.dev/check?proxyip=$proxy" || echo "ERROR")
-      end_time=$(date +%s%3N)
-      response_time=$((end_time - start_time))
-      
-      # Check if API response indicates working proxy
-      if echo "$API_RESPONSE" | grep -q '"status":"alive"' || echo "$API_RESPONSE" | grep -q '"working":true'; then
-        echo "$proxy | ${response_time}ms" >> proxies_working.txt
-        WORKING=$((WORKING + 1))
-        echo "✅ $proxy - ${response_time}ms"
-      else
-        echo "❌ $proxy - Failed"
-      fi
-      
-      # Small delay to be nice to the API
-      sleep 0.5
-      
-    done < proxies_simple.txt
-    
-    echo "" >> proxies_working.txt
-    echo "# 📊 Stats: $WORKING/$TOTAL working" >> proxies_working.txt
-    echo "✅ Found $WORKING working proxies out of $TOTAL using API"
+    - name: Download and process proxies
+      run: |
+        # Download the proxy list
+        wget -q -O proxy_list.csv "https://raw.githubusercontent.com/FoolVPN-ID/Nautica/refs/heads/main/proxyList.txt"
+        
+        # Create header for proxies.txt
+        echo "# Singapore & Malaysia Proxies" > proxies.txt
+        echo "# Source: FoolVPN-ID/Nautica" >> proxies.txt
+        echo "# Updated: $(date)" >> proxies.txt
+        echo "" >> proxies.txt
+        
+        # Filter for SG and MY
+        echo "# 🇸🇬 Singapore Proxies (SG)" >> proxies.txt
+        grep ",SG," proxy_list.csv | sed 's/,/ : /g' | sed 's/,SG,/: Singapore |/g' >> proxies.txt
+        echo "" >> proxies.txt
+        
+        echo "# 🇲🇾 Malaysia Proxies (MY)" >> proxies.txt
+        grep ",MY," proxy_list.csv | sed 's/,/ : /g' | sed 's/,MY,/: Malaysia |/g' >> proxies.txt
+        echo "" >> proxies.txt
+        
+        # Count and add statistics
+        SG_COUNT=$(grep -c ",SG," proxy_list.csv || true)
+        MY_COUNT=$(grep -c ",MY," proxy_list.csv || true)
+        
+        echo "# 📊 Statistics" >> proxies.txt
+        echo "# Singapore: $SG_COUNT" >> proxies.txt
+        echo "# Malaysia: $MY_COUNT" >> proxies.txt
+        echo "# Total: $((SG_COUNT + MY_COUNT))" >> proxies.txt
+        
+        echo "✅ Processed $SG_COUNT SG proxies and $MY_COUNT MY proxies"
+        
+    - name: Create simple list for API testing
+      run: |
+        echo "# Simple Proxy List for API Validation" > proxies_simple.txt
+        echo "# Updated: $(date)" >> proxies_simple.txt
+        echo "" >> proxies_simple.txt
+        
+        # Extract IP:PORT using awk
+        awk -F, '/,SG,|,MY,/ {print $1 ":" $2}' proxy_list.csv >> proxies_simple.txt
+        
+        echo "📄 Created proxies_simple.txt with $(grep -c ':' proxies_simple.txt || echo 0) proxies"
+        
+    - name: Validate proxies with API (Bash)
+      run: |
+        echo "🔍 Validating proxies using API..."
+        echo "# 🟢 WORKING Proxies (API Validated)" > proxies_working.txt
+        echo "# API: cf-workers-checkproxyip.pages.dev" >> proxies_working.txt
+        echo "# Validated: $(date)" >> proxies_working.txt
+        echo "" >> proxies_working.txt
+        
+        # Also create simple working version
+        echo "# Simple Working Proxies" > proxies_working_simple.txt
+        echo "# Validated: $(date)" >> proxies_working_simple.txt
+        echo "" >> proxies_working_simple.txt
+        
+        TOTAL=0
+        WORKING=0
+        
+        # Check if proxies_simple.txt exists and has content
+        if [ ! -f "proxies_simple.txt" ]; then
+          echo "❌ ERROR: proxies_simple.txt not found!"
+          exit 1
+        fi
+        
+        if [ ! -s "proxies_simple.txt" ]; then
+          echo "❌ ERROR: proxies_simple.txt is empty!"
+          exit 1
+        fi
+        
+        echo "📁 Found proxies_simple.txt, starting validation..."
+        
+        # Test each proxy using your API
+        while IFS= read -r proxy; do
+          [[ -z "$proxy" ]] && continue
+          [[ "$proxy" =~ ^# ]] && continue
+          
+          TOTAL=$((TOTAL + 1))
+          echo "Testing [$TOTAL]: $proxy"
+          
+          start_time=$(date +%s%3N)
+          API_RESPONSE=$(curl -s --max-time 10 "https://cf-workers-checkproxyip.pages.dev/check?proxyip=$proxy" 2>/dev/null || echo "ERROR")
+          end_time=$(date +%s%3N)
+          response_time=$((end_time - start_time))
+          
+          # Check if API response indicates working proxy
+          if echo "$API_RESPONSE" | grep -q '"status":"alive"' || echo "$API_RESPONSE" | grep -q '"working":true' || echo "$API_RESPONSE" | grep -q 'success'; then
+            echo "$proxy | ${response_time}ms" >> proxies_working.txt
+            echo "$proxy" >> proxies_working_simple.txt
+            WORKING=$((WORKING + 1))
+            echo "✅ $proxy - ${response_time}ms"
+          else
+            echo "❌ $proxy - Failed (Response: ${API_RESPONSE:0:50}...)"
+          fi
+          
+          # Small delay to be nice to the API (0.2 seconds)
+          sleep 0.2
+          
+        done < proxies_simple.txt
+        
+        echo "" >> proxies_working.txt
+        echo "# 📊 Statistics" >> proxies_working.txt
+        echo "# Total Tested: $TOTAL" >> proxies_working.txt
+        echo "# Working: $WORKING" >> proxies_working.txt
+        echo "# Dead: $((TOTAL - WORKING))" >> proxies_working.txt
+        if [ $TOTAL -gt 0 ]; then
+          SUCCESS_RATE=$((WORKING * 100 / TOTAL))
+          echo "# Success Rate: ${SUCCESS_RATE}%" >> proxies_working.txt
+        fi
+        echo "# Validated: $(date)" >> proxies_working.txt
+        
+        echo "✅ Found $WORKING working proxies out of $TOTAL using API"
+        
+    - name: Commit changes
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add proxies.txt proxies_simple.txt proxies_working.txt proxies_working_simple.txt
+        git commit -m "🤖 Update: SG/MY proxies + API validation [$(date +%H:%M)]" || exit 0
+        git push
