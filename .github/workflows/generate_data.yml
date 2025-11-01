@@ -1,6 +1,8 @@
 name: 📊 Generate Data File
 
 on:
+ schedule:
+  - cron: '0 * * * *'  # ← Run at minute 0 of every hour
   workflow_dispatch:
 
 permissions:
