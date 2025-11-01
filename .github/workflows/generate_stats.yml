@@ -50,10 +50,10 @@ jobs:
         # Create stats directory if not exists
         mkdir -p stats
         
-        # Append to daily stats file
+        # Append to daily stats file (FIXED: proper JSON formatting)
         echo "{\"timestamp\": \"$TIMESTAMP\", \"total\": $TOTAL_COUNT, \"working\": $WORKING_COUNT, \"success_rate\": $SUCCESS_RATE, \"hour\": \"$HOUR\"}" >> stats/daily-stats.json
         
-        # Create current stats snapshot
+        # Create current stats snapshot (FIXED: simple file creation)
         echo "{" > stats/current-stats.json
         echo "  \"last_updated\": \"$TIMESTAMP\"," >> stats/current-stats.json
         echo "  \"total_proxies\": $TOTAL_COUNT," >> stats/current-stats.json
@@ -66,4 +66,25 @@ jobs:
         
         echo "✅ Statistics generated:"
         echo "   - Total: $TOTAL_COUNT"
-        echo "   - Working:
+        echo "   - Working: $WORKING_COUNT"
+        echo "   - Success Rate: $SUCCESS_RATE%"
+        
+    - name: Clean old stats (keep 7 days)
+      run: |
+        echo "🧹 Cleaning old stats data..."
+        # Keep only last 7 days of daily stats (84 entries = 7 days * 12 updates/day)
+        if [ -f "stats/daily-stats.json" ]; then
+          tail -n 84 stats/daily-stats.json > stats/daily-stats-temp.json 2>/dev/null || true
+          mv stats/daily-stats-temp.json stats/daily-stats.json 2>/dev/null || true
+          echo "✅ Kept last 7 days of statistics"
+        else
+          echo "⚠️ No daily stats file found"
+        fi
+        
+    - name: Commit statistics
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add stats/
+        git commit -m "📈 Update statistics [$(date +%H:%M)]" || echo "No changes to commit"
+        git push
