@@ -2,8 +2,6 @@ name: 📊 Generate Data File
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '30 */2 * * *'  # 30 minutes past every 2 hours
 
 permissions:
   contents: write
@@ -46,40 +44,37 @@ jobs:
           SUCCESS_RATE=0
         fi
         
-        # Get sample proxies (first 10 working ones)
+        # Get sample proxies (first 5 working ones)
         if [ $WORKING_COUNT -gt 0 ]; then
-          SAMPLE_PROXIES=$(grep '^[0-9]' proxies_working_simple.txt 2>/dev/null | head -10 | tr '\n' ',' | sed 's/,$//')
+          SAMPLE_PROXIES=$(grep '^[0-9]' proxies_working_simple.txt 2>/dev/null | head -5 | tr '\n' ' ' | sed 's/ /","/g' | sed 's/^/"/' | sed 's/""$//')
         else
           SAMPLE_PROXIES=""
         fi
         
-        # Create data.js
-        cat > data.js << EOF
-// Proxy Data - Auto-generated
-// Updated: $(date)
-
-const proxyData = {
-    lastUpdated: "$(date -Iseconds)",
-    statistics: {
-        totalProxies: $TOTAL_COUNT,
-        workingProxies: $WORKING_COUNT,
-        successRate: $SUCCESS_RATE,
-        lastValidation: "$(date -Iseconds)"
-    },
-    sampleProxies: [$SAMPLE_PROXIES],
-    countries: ["SG", "MY"]
-};
-
-// Export for different environments
-if (typeof window !== 'undefined') window.proxyData = proxyData;
-if (typeof module !== 'undefined' && module.exports) module.exports = proxyData;
-EOF
+        # Create data.js with proper formatting
+        echo "// Proxy Data - Auto-generated" > data.js
+        echo "// Updated: $(date)" >> data.js
+        echo "" >> data.js
+        echo "const proxyData = {" >> data.js
+        echo "    lastUpdated: \"$(date -Iseconds)\"," >> data.js
+        echo "    statistics: {" >> data.js
+        echo "        totalProxies: $TOTAL_COUNT," >> data.js
+        echo "        workingProxies: $WORKING_COUNT," >> data.js
+        echo "        successRate: $SUCCESS_RATE," >> data.js
+        echo "        lastValidation: \"$(date -Iseconds)\"" >> data.js
+        echo "    }," >> data.js
+        echo "    sampleProxies: [$SAMPLE_PROXIES]," >> data.js
+        echo "    countries: [\"SG\", \"MY\"]" >> data.js
+        echo "};" >> data.js
+        echo "" >> data.js
+        echo "// Export for different environments" >> data.js
+        echo "if (typeof window !== 'undefined') window.proxyData = proxyData;" >> data.js
+        echo "if (typeof module !== 'undefined' && module.exports) module.exports = proxyData;" >> data.js
         
         echo "✅ data.js created:"
         echo "   - Total proxies: $TOTAL_COUNT"
         echo "   - Working proxies: $WORKING_COUNT" 
         echo "   - Success rate: $SUCCESS_RATE%"
-        echo "   - Sample proxies: $(echo "$SAMPLE_PROXIES" | tr ',' ' ' | wc -w)"
         
     - name: Commit data file
       run: |
