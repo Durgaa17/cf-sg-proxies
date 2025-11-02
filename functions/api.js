@@ -1,4 +1,6 @@
-// functions/api.js - With Basic Proxy Data
+// functions/api.js - Connected to your data.js
+const proxyData = require('../data.js');
+
 exports.handler = async function(event, context) {
     const headers = {
         'Content-Type': 'application/json',
@@ -9,21 +11,9 @@ exports.handler = async function(event, context) {
         return { statusCode: 200, headers, body: '' };
     }
 
-    const { action, country } = event.queryStringParameters || {};
-
-    // Simple proxy data (we'll connect to data.js later)
-    const proxyData = {
-        sg: ['13.250.131.37:443', '54.255.185.94:443'],
-        my: ['52.77.225.242:443', '13.76.157.24:443'],
-        working: ['13.250.131.37:443', '54.255.185.94:443'],
-        lastUpdated: new Date().toISOString()
-    };
+    const { action, country, proxy } = event.queryStringParameters || {};
 
     if (action === 'proxies') {
-        let proxies = [];
-        if (!country || country === 'SG') proxies = proxies.concat(proxyData.sg);
-        if (!country || country === 'MY') proxies = proxies.concat(proxyData.my);
-        
         return {
             statusCode: 200,
             headers,
@@ -31,8 +21,8 @@ exports.handler = async function(event, context) {
                 success: true,
                 action: 'proxies',
                 country: country || 'all',
-                proxies: proxies,
-                count: proxies.length,
+                proxies: proxyData.sampleProxies,
+                count: proxyData.sampleProxies.length,
                 lastUpdated: proxyData.lastUpdated
             })
         };
@@ -45,8 +35,8 @@ exports.handler = async function(event, context) {
             body: JSON.stringify({
                 success: true,
                 action: 'working',
-                proxies: proxyData.working,
-                count: proxyData.working.length,
+                proxies: proxyData.sampleProxies,
+                count: proxyData.sampleProxies.length,
                 lastUpdated: proxyData.lastUpdated
             })
         };
@@ -59,22 +49,14 @@ exports.handler = async function(event, context) {
             body: JSON.stringify({
                 success: true,
                 action: 'statistics',
-                data: {
-                    totalProxies: proxyData.sg.length + proxyData.my.length,
-                    workingProxies: proxyData.working.length,
-                    successRate: 75,
-                    lastUpdated: proxyData.lastUpdated
-                }
+                data: proxyData.statistics,
+                lastUpdated: proxyData.lastUpdated
             })
         };
     }
 
     if (action === 'random') {
-        const pool = country === 'SG' ? proxyData.sg : 
-                    country === 'MY' ? proxyData.my : 
-                    [...proxyData.sg, ...proxyData.my];
-        
-        const randomProxy = pool[Math.floor(Math.random() * pool.length)];
+        const randomProxy = proxyData.sampleProxies[Math.floor(Math.random() * proxyData.sampleProxies.length)];
         
         return {
             statusCode: 200,
@@ -88,6 +70,22 @@ exports.handler = async function(event, context) {
         };
     }
 
+    if (action === 'countries') {
+        return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({
+                success: true,
+                action: 'countries',
+                countries: proxyData.countries,
+                counts: {
+                    total: proxyData.statistics.totalProxies,
+                    working: proxyData.statistics.workingProxies
+                }
+            })
+        };
+    }
+
     return {
         statusCode: 200,
         headers,
@@ -96,11 +94,13 @@ exports.handler = async function(event, context) {
             message: '🚀 SG/MY Proxy API',
             version: '2.0',
             endpoints: {
-                'proxies': 'Get proxies by country',
+                'proxies': 'Get all proxies',
                 'working': 'Get working proxies', 
                 'statistics': 'Get statistics',
-                'random': 'Get random proxy'
-            }
+                'random': 'Get random proxy',
+                'countries': 'Get countries info'
+            },
+            example: 'https://sgproxycf.netlify.app/.netlify/functions/api?action=proxies'
         })
     };
 };
