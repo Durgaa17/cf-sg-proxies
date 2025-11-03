@@ -11,15 +11,28 @@ permissions:
 jobs:
   update-proxies:
     runs-on: ubuntu-latest
-    
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      
+
     - name: Download and process proxies
       run: |
+        set -e  # Exit on error
+        
         # Download the proxy list
-        wget -q -O proxy_list.csv "https://raw.githubusercontent.com/FoolVPN-ID/Nautica/refs/heads/main/proxyList.txt"
+        echo "📥 Downloading proxy list..."
+        wget -q -O proxy_list.csv "https://raw.githubusercontent.com/FoolVPN-ID/Nautica/refs/heads/main/proxyList.txt" || {
+          echo "❌ Failed to download proxy list"
+          exit 1
+        }
+        
+        # Check if file was downloaded and has content
+        if [ ! -s "proxy_list.csv" ]; then
+          echo "❌ Downloaded file is empty or missing"
+          exit 1
+        fi
+        
+        echo "✅ Proxy list downloaded successfully"
         
         # Create header for proxies.txt
         echo "# Singapore & Malaysia Proxies" > proxies.txt
@@ -29,38 +42,66 @@ jobs:
         
         # Filter for SG and MY
         echo "# 🇸🇬 Singapore Proxies (SG)" >> proxies.txt
-        grep ",SG," proxy_list.csv | sed 's/,/ : /g' | sed 's/,SG,/: Singapore |/g' >> proxies.txt
-        echo "" >> proxies.txt
+        if grep -q ",SG," proxy_list.csv; then
+          grep ",SG," proxy_list.csv | sed 's/,/ : /g' | sed 's/,SG,/: Singapore |/g' >> proxies.txt
+        else
+          echo "# No Singapore proxies found" >> proxies.txt
+        fi
         
+        echo "" >> proxies.txt
         echo "# 🇲🇾 Malaysia Proxies (MY)" >> proxies.txt
-        grep ",MY," proxy_list.csv | sed 's/,/ : /g' | sed 's/,MY,/: Malaysia |/g' >> proxies.txt
+        if grep -q ",MY," proxy_list.csv; then
+          grep ",MY," proxy_list.csv | sed 's/,/ : /g' | sed 's/,MY,/: Malaysia |/g' >> proxies.txt
+        else
+          echo "# No Malaysia proxies found" >> proxies.txt
+        fi
+        
         echo "" >> proxies.txt
         
         # Count and add statistics
-        SG_COUNT=$(grep -c ",SG," proxy_list.csv || true)
-        MY_COUNT=$(grep -c ",MY," proxy_list.csv || true)
+        SG_COUNT=$(grep -c ",SG," proxy_list.csv || echo 0)
+        MY_COUNT=$(grep -c ",MY," proxy_list.csv || echo 0)
+        TOTAL=$((SG_COUNT + MY_COUNT))
         
         echo "# 📊 Statistics" >> proxies.txt
         echo "# Singapore: $SG_COUNT" >> proxies.txt
         echo "# Malaysia: $MY_COUNT" >> proxies.txt
-        echo "# Total: $((SG_COUNT + MY_COUNT))" >> proxies.txt
+        echo "# Total: $TOTAL" >> proxies.txt
         
-        echo "✅ Processed $SG_COUNT SG proxies and $MY_COUNT MY proxies"
-        
+        echo "✅ Processed $SG_COUNT SG proxies and $MY_COUNT MY proxies (Total: $TOTAL)"
+
     - name: Create simple list for API testing
       run: |
         echo "# Simple Proxy List for API Validation" > proxies_simple.txt
         echo "# Updated: $(date)" >> proxies_simple.txt
         echo "" >> proxies_simple.txt
         
-        # Extract IP:PORT using awk
-        awk -F, '/,SG,|,MY,/ {print $1 ":" $2}' proxy_list.csv >> proxies_simple.txt
-        
-        echo "📄 Created proxies_simple.txt with $(grep -c ':' proxies_simple.txt || echo 0) proxies"
-        
-    - name: Validate proxies with API (Bash)
+        # Check if we have proxies to process
+        if [ -f "proxy_list.csv" ] && [ -s "proxy_list.csv" ]; then
+          # Extract IP:PORT using awk
+          awk -F, '/,SG,|,MY,/ {print $1 ":" $2}' proxy_list.csv >> proxies_simple.txt
+          PROXY_COUNT=$(grep -c ':' proxies_simple.txt || echo 0)
+          echo "📄 Created proxies_simple.txt with $PROXY_COUNT proxies"
+        else
+          echo "⚠️ No proxies to process for simple list"
+          echo "# No proxies available" >> proxies_simple.txt
+        fi
+
+    - name: Validate proxies with API
       run: |
-        echo "🔍 Validating proxies using API..."
+        echo "🔍 Starting proxy validation..."
+        
+        # Check if we have proxies to validate
+        if [ ! -f "proxies_simple.txt" ] || [ ! -s "proxies_simple.txt" ]; then
+          echo "❌ ERROR: proxies_simple.txt not found or empty!"
+          # Create empty working files
+          echo "# 🟢 WORKING Proxies (API Validated)" > proxies_working.txt
+          echo "# No proxies available for validation" >> proxies_working.txt
+          echo "# Simple Working Proxies" > proxies_working_simple.txt
+          echo "# No proxies available" >> proxies_working_simple.txt
+          exit 0
+        fi
+        
         echo "# 🟢 WORKING Proxies (API Validated)" > proxies_working.txt
         echo "# API: cf-workers-checkproxyip.pages.dev" >> proxies_working.txt
         echo "# Validated: $(date)" >> proxies_working.txt
@@ -73,17 +114,6 @@ jobs:
         
         TOTAL=0
         WORKING=0
-        
-        # Check if proxies_simple.txt exists and has content
-        if [ ! -f "proxies_simple.txt" ]; then
-          echo "❌ ERROR: proxies_simple.txt not found!"
-          exit 1
-        fi
-        
-        if [ ! -s "proxies_simple.txt" ]; then
-          echo "❌ ERROR: proxies_simple.txt is empty!"
-          exit 1
-        fi
         
         echo "📁 Found proxies_simple.txt, starting validation..."
         
@@ -101,7 +131,9 @@ jobs:
           response_time=$((end_time - start_time))
           
           # Check if API response indicates working proxy
-          if echo "$API_RESPONSE" | grep -q '"status":"alive"' || echo "$API_RESPONSE" | grep -q '"working":true' || echo "$API_RESPONSE" | grep -q 'success'; then
+          if echo "$API_RESPONSE" | grep -q '"status":"alive"' || \
+             echo "$API_RESPONSE" | grep -q '"working":true' || \
+             echo "$API_RESPONSE" | grep -q 'success'; then
             echo "$proxy | ${response_time}ms" >> proxies_working.txt
             echo "$proxy" >> proxies_working_simple.txt
             WORKING=$((WORKING + 1))
@@ -120,18 +152,21 @@ jobs:
         echo "# Total Tested: $TOTAL" >> proxies_working.txt
         echo "# Working: $WORKING" >> proxies_working.txt
         echo "# Dead: $((TOTAL - WORKING))" >> proxies_working.txt
+        
         if [ $TOTAL -gt 0 ]; then
           SUCCESS_RATE=$((WORKING * 100 / TOTAL))
           echo "# Success Rate: ${SUCCESS_RATE}%" >> proxies_working.txt
         fi
+        
         echo "# Validated: $(date)" >> proxies_working.txt
-        
         echo "✅ Found $WORKING working proxies out of $TOTAL using API"
-        
+
     - name: Commit changes
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         git add proxies.txt proxies_simple.txt proxies_working.txt proxies_working_simple.txt
-        git commit -m "🤖 Update: SG/MY proxies + API validation [$(date +%H:%M)]" || exit 0
-        git push
+        git diff --staged --quiet || {
+          git commit -m "🤖 Update: SG/MY proxies + API validation [$(date +%H:%M)]"
+          git push
+        } || echo "⚠️ No changes to commit"
