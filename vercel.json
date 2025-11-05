@@ -1,12 +1,8 @@
 {
   "buildCommand": "npm run build",
   "functions": {
-    "functions/api.js": {
+    "api/proxies.js": {
       "maxDuration": 10
     }
-  },
-  "routes": [
-    { "src": "/data.js", "dest": "/data.js" },
-    { "src": "/api", "dest": "/functions/api.js" }
-  ]
+  }
 }
