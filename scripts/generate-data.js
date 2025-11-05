@@ -1,12 +1,12 @@
 // scripts/generate-data.js
-const fs = require('fs');
-const path = require('path');
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
-const PROXIES_TXT = path.join(__dirname, '../proxies.txt');
-const DATA_JS = path.join(__dirname, '../data.js');
+const PROXIES_TXT = join(import.meta.dirname, '../proxies.txt');
+const DATA_JS = join(import.meta.dirname, '../data.js');
 
 function parse() {
-    const content = fs.readFileSync(PROXIES_TXT, 'utf8');
+    const content = readFileSync(PROXIES_TXT, 'utf8');
     const lines = content.split('\n');
     const sg = [], my = [];
     let inSG = false, inMY = false;
@@ -45,5 +45,5 @@ if (typeof window !== 'undefined') window.proxyData = proxyData;
 if (typeof module !== 'undefined') module.exports = proxyData;
 `;
 
-fs.writeFileSync(DATA_JS, js);
+writeFileSync(DATA_JS, js);
 console.log(`Generated data.js: ${data.sg.length} SG, ${data.my.length} MY`);
