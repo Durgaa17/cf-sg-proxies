@@ -1,5 +1,6 @@
 {
   "buildCommand": "npm run build",
+  "outputDirectory": ".",
   "functions": {
     "api/proxies.js": {
       "maxDuration": 10
