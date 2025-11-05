@@ -4,77 +4,173 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SG/MY Proxy Server</title>
+    <!-- Load auto-generated data.js from root -->
     <script src="/data.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .endpoint { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
-        button { background: #007acc; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #005a9e; }
-        .result { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #007acc; }
+        :root {
+            --primary: #007acc;
+            --primary-dark: #005a9e;
+            --bg: #f9f9fb;
+            --card: #ffffff;
+            --border: #e1e4e8;
+            --text: #24292e;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        h1 { color: var(--primary); text-align: center; }
+        .stats {
+            background: var(--card);
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            margin: 20px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .endpoint {
+            background: var(--card);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .endpoint h3 { margin-top: 0; color: var(--primary); }
+        code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-family: 'Courier New', monospace;
+        }
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            margin: 4px 2px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+        button:hover { background: var(--primary-dark); }
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            width: 220px;
+            font-size: 0.9em;
+        }
+        .result {
+            background: var(--card);
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.9em;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
     <h1>SG/MY Proxy Server</h1>
-    <p>Simple proxy list API and validation service</p>
-    
-    <div id="stats"></div>
+    <p style="text-align:center;">Free Singapore & Malaysia proxy list with real-time validation</p>
+
+    <!-- Stats from data.js -->
+    <div id="stats" class="stats"></div>
 
     <h2>API Endpoints</h2>
-    
+
+    <!-- Get Proxies -->
     <div class="endpoint">
-        <h3>Get All Proxies</h3>
-        <code>GET /api?action=proxies&country=SG</code><br><br>
-        <button onclick="getProxies('SG')">Get SG</button>
-        <button onclick="getProxies('MY')">Get MY</button>
-        <button onclick="getProxies('all')">Get All</button>
+        <h3>Get Proxies by Country</h3>
+        <code>GET /api/proxies?action=proxies&country=SG</code><br><br>
+        <button onclick="getProxies('SG')">SG Proxies</button>
+        <button onclick="getProxies('MY')">MY Proxies</button>
+        <button onclick="getProxies('all')">All Proxies</button>
     </div>
 
+    <!-- Working Proxies -->
     <div class="endpoint">
         <h3>Get Working Proxies</h3>
-        <code>GET /api?action=working</code><br><br>
+        <code>GET /api/proxies?action=working</code><br><br>
         <button onclick="getWorkingProxies()">Get Working</button>
     </div>
 
+    <!-- Check Proxy -->
     <div class="endpoint">
-        <h3>Check Proxy</h3>
-        <code>GET /api?action=check&proxy=IP:PORT</code><br><br>
-        <input type="text" id="proxyToCheck" placeholder="47.74.254.191:8900" style="padding: 5px; width: 200px;">
-        <button onclick="checkProxy()">Check</button>
+        <h3>Check Proxy (Live Test)</h3>
+        <code>GET /api/proxies?action=check&proxy=IP:PORT</code><br><br>
+        <input type="text" id="proxyToCheck" placeholder="47.74.254.191:8900">
+        <button onclick="checkProxy()">Check Proxy</button>
     </div>
 
+    <!-- Random Proxy -->
     <div class="endpoint">
         <h3>Get Random Proxy</h3>
-        <code>GET /api?action=random&country=SG</code><br><br>
+        <code>GET /api/proxies?action=random&country=SG</code><br><br>
         <button onclick="getRandomProxy('SG')">Random SG</button>
         <button onclick="getRandomProxy('MY')">Random MY</button>
         <button onclick="getRandomProxy()">Random Any</button>
     </div>
 
+    <!-- Results -->
     <div id="results"></div>
 
+    <div class="footer">
+        Updated from <code>proxies.txt</code> • Auto-refreshed on deploy
+    </div>
+
     <script>
+        // === Show Stats from data.js ===
         function showStats() {
+            const s = proxyData.stats;
+            const updated = new Date(proxyData.lastUpdated).toLocaleString();
             document.getElementById('stats').innerHTML = `
-                <div style="background: #e8f4fd; padding: 15px; border-radius: 5px;">
-                    <strong>Statistics</strong><br>
-                    Total: ${proxyData.stats.totalProxies}<br>
-                    Working: ${proxyData.stats.workingProxies}<br>
-                    Success: ${proxyData.stats.successRate}%<br>
-                    Updated: ${new Date(proxyData.lastUpdated).toLocaleString()}
-                </div>
+                <strong>Statistics</strong><br>
+                Total Proxies: <strong>${s.totalProxies}</strong><br>
+                Working Proxies: <strong>${s.workingProxies}</strong><br>
+                Success Rate: <strong>${s.successRate}%</strong><br>
+                Last Updated: <strong>${updated}</strong>
             `;
         }
 
+        // === API Call Helper ===
         async function apiCall(params) {
-            const url = new URL('/api', location.origin);
+            const url = new URL('/api/proxies', location.origin);
             Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
             const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             return await res.json();
         }
 
+        // === API Functions ===
         async function getProxies(country) {
-            const data = await apiCall({ action: 'proxies', country });
-            showResult('Proxies', data);
+            try {
+                const data = await apiCall({ action: 'proxies', country });
+                showResult(`Proxies (${country.toUpperCase()})`, data);
+            } catch (e) {
+                showResult('Error', { error: e.message });
+            }
         }
 
         async function getWorkingProxies() {
@@ -84,10 +180,17 @@
 
         async function checkProxy() {
             const proxy = document.getElementById('proxyToCheck').value.trim();
-            if (!proxy) return alert('Enter proxy');
-            showResult('Checking...', `Testing ${proxy}...`);
-            const data = await apiCall({ action: 'check', proxy });
-            showResult('Result', data);
+            if (!proxy || !proxy.includes(':')) {
+                alert('Enter valid proxy: IP:PORT');
+                return;
+            }
+            showResult('Checking Proxy...', `Testing <code>${proxy}</code>...`);
+            try {
+                const data = await apiCall({ action: 'check', proxy });
+                showResult('Check Result', data);
+            } catch (e) {
+                showResult('Error', { error: e.message });
+            }
         }
 
         async function getRandomProxy(country) {
@@ -95,8 +198,10 @@
             showResult('Random Proxy', data);
         }
 
+        // === Show Result ===
         function showResult(title, data) {
-            document.getElementById('results').innerHTML = `
+            const el = document.getElementById('results');
+            el.innerHTML = `
                 <div class="result">
                     <h3>${title}</h3>
                     <pre>${JSON.stringify(data, null, 2)}</pre>
@@ -104,17 +209,22 @@
             `;
         }
 
+        // === Init ===
         showStats();
 
-        // Auto-run from URL
+        // Auto-run from URL: ?action=proxies&country=SG
         const params = new URLSearchParams(location.search);
         const action = params.get('action');
         const country = params.get('country');
         const proxy = params.get('proxy');
-        if (action === 'proxies') getProxies(country || 'all');
-        if (action === 'working') getWorkingProxies();
-        if (action === 'check' && proxy) { document.getElementById('proxyToCheck').value = proxy; checkProxy(); }
-        if (action === 'random') getRandomProxy(country);
+
+        if (action === 'proxies' && country) getProxies(country);
+        else if (action === 'working') getWorkingProxies();
+        else if (action === 'check' && proxy) {
+            document.getElementById('proxyToCheck').value = proxy;
+            checkProxy();
+        }
+        else if (action === 'random') getRandomProxy(country || '');
     </script>
 </body>
 </html>
