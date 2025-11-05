@@ -5,4 +5,5 @@ edtunnel cloudflare Singapore proxies - update regurlarly ☺️
 
 Live proxy list with **latency check** and **copy** feature.
 
-**Live Site**: [https://yourusername.github.io/cf-sg-proxies-page](https://durgaa17.github.io/cf-sg-proxies)
+**Live Site**: 
+[https://cf-sg-proxies.vercel.app/](https://cf-sg-proxies.vercel.app/)
