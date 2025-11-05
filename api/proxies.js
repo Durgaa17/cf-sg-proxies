@@ -1,4 +1,4 @@
-// functions/api.js
+// api/proxies.js
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -75,10 +75,10 @@ export default async function handler(req, res) {
         success: true,
         message: 'SG/MY Proxy API',
         endpoints: {
-            '/api?action=proxies&country=SG': 'List SG',
-            '/api?action=working': 'Working list',
-            '/api?action=random&country=MY': 'Random MY',
-            '/api?action=check&proxy=47.74.254.191:8900': 'Check'
+            '/api/proxies?action=proxies&country=SG': 'List SG',
+            '/api/proxies?action=working': 'Working list',
+            '/api/proxies?action=random&country=MY': 'Random MY',
+            '/api/proxies?action=check&proxy=47.74.254.191:8900': 'Check'
         }
     });
 }
