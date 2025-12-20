@@ -1,0 +1,4 @@
+# Simple Working Proxies
+# Validated: Thu Dec 18 14:22:35 UTC 2025
+
+194.36.179.5:2053
