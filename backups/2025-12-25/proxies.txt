@@ -1,6 +1,6 @@
 # Singapore & Malaysia Proxies
 # Source: FoolVPN-ID/Nautica
-# Updated: Sun Dec 21 06:30:26 UTC 2025
+# Updated: Wed Dec 24 14:20:04 UTC 2025
 
 # 🇸🇬 Singapore Proxies (SG)
 47.74.254.191 : 8900 : SG : Alibaba Cloud - SG
@@ -12,27 +12,25 @@
 194.127.193.240 : 50791 : SG : Greencloud LLC
 47.236.119.190 : 51342 : SG : Alibaba Cloud LLC
 129.150.49.58 : 18650 : SG : Oracle Corporation
-129.150.36.188 : 53435 : SG : Oracle Corporation
 194.127.193.124 : 24467 : SG : Greencloud LLC
+129.150.36.188 : 53435 : SG : Oracle Corporation
 138.2.95.61 : 1111 : SG : Oracle Corporation
 168.138.170.211 : 53702 : SG : Oracle Public Cloud
 45.32.100.46 : 13802 : SG : Vultr Holdings :  LLC
 8.219.1.169 : 443 : SG : Alibaba Cloud (Singapore) Private Limited
 45.76.183.217 : 49292 : SG : Vultr Holdings :  LLC
-168.138.184.172 : 443 : SG : Oracle Public Cloud
 8.222.220.81 : 25435 : SG : Alibaba Cloud (Singapore) Private Limited
-51.79.158.58 : 8443 : SG : OVH Singapore PTE. LTD
 8.219.58.164 : 57373 : SG : Alibaba Cloud (Singapore) Private Limited
 194.36.178.36 : 8443 : SG : FIRST SERVER LIMITED
 91.192.81.154 : 2053 : SG : Melbikomas UAB
+51.79.158.58 : 8443 : SG : OVH Singapore PTE. LTD
 104.248.145.216 : 443 : SG : DigitalOcean :  LLC
 138.2.69.236 : 23334 : SG : Oracle Corporation
-143.42.66.91 : 443 : SG : Viewqwest Pte Ltd
 146.235.19.79 : 28983 : SG : Oracle Corporation
+143.42.66.91 : 443 : SG : Viewqwest Pte Ltd
 164.52.2.100 : 443 : SG : UCUL-SG
-164.52.2.98 : 443 : SG : UCUL-SG
 164.52.2.99 : 443 : SG : UCUL-SG
-168.138.165.174 : 443 : SG : Oracle Public Cloud
+164.52.2.98 : 443 : SG : UCUL-SG
 168.138.171.70 : 23280 : SG : Oracle Public Cloud
 194.36.178.36 : 2053 : SG : FIRST SERVER LIMITED
 185.81.28.95 : 30503 : SG : AKILE LTD
@@ -43,17 +41,16 @@
 31.192.238.71 : 2053 : SG : PDK LLC
 31.192.238.71 : 8443 : SG : PDK LLC
 43.156.116.194 : 443 : SG : 6 COLLYER QUAY
-43.156.181.203 : 443 : SG : 16 COLLYER QUAY
 43.128.95.84 : 38091 : SG : 6 COLLYER QUAY
+43.156.181.203 : 443 : SG : 16 COLLYER QUAY
 5.34.176.119 : 81 : SG : Green Floid LLC
-51.79.158.58 : 2053 : SG : OVH Singapore PTE. LTD
 13.250.131.37 : 443 : SG : Amazon Data Services Singapore
+51.79.158.58 : 2053 : SG : OVH Singapore PTE. LTD
 
 # 🇲🇾 Malaysia Proxies (MY)
-# No Malaysia proxies found
+38.60.193.247 : 13300 : MY : Kaopu Cloud HK Limited
 
 # 📊 Statistics
-# Singapore: 45
-# Malaysia: 0
-0
-# Total: 
+# Singapore: 43
+# Malaysia: 1
+# Total: 44
