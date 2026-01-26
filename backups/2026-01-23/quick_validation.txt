@@ -1,9 +1,0 @@
-# Quick Validation Results
-# Validated: Thu Jan 22 23:20:46 UTC 2026
-
-✅ 38.60.193.247:13300 - WORKING
-✅ 47.74.254.191:8900 - WORKING
-✅ 129.150.58.86:57621 - WORKING
-✅ 138.2.89.238:43254 - WORKING
-
-Working: 4/4
