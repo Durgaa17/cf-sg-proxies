@@ -1,9 +1,9 @@
 # Quick Validation Results
-# Validated: Tue Jan 27 17:27:26 UTC 2026
+# Validated: Tue Jan 27 18:38:54 UTC 2026
 
 ✅ 38.60.193.247:13300 - WORKING
-✅ 47.74.254.191:8900 - WORKING
+❌ 47.74.254.191:8900 - TIMEOUT
 ✅ 129.150.58.86:57621 - WORKING
 ✅ 146.235.18.248:45137 - WORKING
 
-Working: 4/4
+Working: 3/4
