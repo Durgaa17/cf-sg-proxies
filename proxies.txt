@@ -1,6 +1,6 @@
 # Singapore & Malaysia Proxies
 # Source: FoolVPN-ID/Nautica
-# Updated: Mon Jan 26 04:58:57 UTC 2026
+# Updated: Tue Jan 27 01:52:23 UTC 2026
 
 # 🇸🇬 Singapore Proxies (SG)
 47.74.254.191 : 8900 : SG : Alibaba Cloud - SG
@@ -18,10 +18,9 @@
 8.219.58.164 : 57373 : SG : Alibaba Cloud (Singapore) Private Limited
 194.36.178.36 : 8443 : SG : FIRST SERVER LIMITED
 91.192.81.154 : 2053 : SG : Melbikomas UAB
-51.79.158.58 : 8443 : SG : OVH Singapore PTE. LTD
 104.248.145.216 : 443 : SG : DigitalOcean :  LLC
 138.2.69.236 : 23334 : SG : Oracle Corporation
-143.42.66.91 : 443 : SG : M1 LIMITED
+51.79.158.58 : 8443 : SG : OVH Singapore PTE. LTD
 146.235.19.79 : 28983 : SG : Oracle Corporation
 168.138.171.70 : 23280 : SG : Oracle Public Cloud
 194.36.178.36 : 2053 : SG : FIRST SERVER LIMITED
@@ -29,24 +28,24 @@
 194.36.179.5 : 2053 : SG : FIRST SERVER LIMITED
 164.52.2.100 : 443 : SG : UCUL-SG
 194.36.179.17 : 2053 : SG : FIRST SERVER LIMITED
-164.52.2.99 : 443 : SG : UCUL-SG
 164.52.2.98 : 443 : SG : UCUL-SG
+164.52.2.99 : 443 : SG : UCUL-SG
 194.36.179.17 : 8443 : SG : FIRST SERVER LIMITED
 213.35.100.31 : 47112 : SG : Oracle Svenska AB
-31.192.238.71 : 2053 : SG : PDK LLC
-31.192.238.71 : 8443 : SG : PDK LLC
+143.42.66.91 : 443 : SG : M1 LIMITED
 43.156.116.194 : 443 : SG : 6 COLLYER QUAY
 43.156.181.203 : 443 : SG : 16 COLLYER QUAY
 43.128.95.84 : 38091 : SG : 6 COLLYER QUAY
 5.34.176.119 : 81 : SG : Green Floid LLC
 51.79.158.58 : 2053 : SG : OVH Singapore PTE. LTD
-91.192.81.154 : 8443 : SG : Melbikomas UAB
 13.250.131.37 : 443 : SG : Amazon Data Services Singapore
+31.192.238.71 : 8443 : SG : PDK LLC
+31.192.238.71 : 2053 : SG : PDK LLC
 
 # 🇲🇾 Malaysia Proxies (MY)
 38.60.193.247 : 13300 : MY : Kaopu Cloud HK Limited
 
 # 📊 Statistics
-# Singapore: 39
+# Singapore: 38
 # Malaysia: 1
-# Total: 40
+# Total: 39
