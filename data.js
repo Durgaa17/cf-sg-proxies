@@ -1,15 +1,15 @@
 // Proxy Data - Auto-generated
-// Updated: Fri Jan 30 08:55:49 UTC 2026
+// Updated: Fri Jan 30 10:53:03 UTC 2026
 
 const proxyData = {
-    lastUpdated: "2026-01-30T08:55:49+00:00",
+    lastUpdated: "2026-01-30T10:53:03+00:00",
     statistics: {
-        totalProxies: 42,
-        workingProxies: 42,
-        successRate: 100,
-        lastValidation: "2026-01-30T08:55:49+00:00"
+        totalProxies: 44,
+        workingProxies: 43,
+        successRate: 97,
+        lastValidation: "2026-01-30T10:53:03+00:00"
     },
-    sampleProxies: ["38.60.193.247:13300","47.74.254.191:8900","146.235.18.248:45137","129.150.58.86:57621","213.35.108.135:12596","],
+    sampleProxies: ["38.60.193.247:13300","183.252.205.37:11101","47.74.254.191:8900","129.150.58.86:57621","146.235.18.248:45137","],
     countries: ["SG", "MY"]
 };
 
