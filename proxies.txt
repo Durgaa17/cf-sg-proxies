@@ -1,6 +1,6 @@
 # Singapore & Malaysia Proxies
 # Source: FoolVPN-ID/Nautica
-# Updated: Wed Feb 18 02:10:14 UTC 2026
+# Updated: Wed Feb 18 05:22:43 UTC 2026
 
 # 🇸🇬 Singapore Proxies (SG)
 183.252.205.37 : 11101 : SG : Greencloud LLC
