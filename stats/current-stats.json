@@ -1,9 +1,9 @@
 {
-  "last_updated": "2026-02-23T19:42:36+00:00",
+  "last_updated": "2026-02-23T21:28:06+00:00",
   "total_proxies": 34,
-  "working_proxies": 34,
-  "success_rate": 100,
-  "failed_proxies": 0,
+  "working_proxies": 33,
+  "success_rate": 97,
+  "failed_proxies": 1,
   "countries": ["SG", "MY"],
   "update_frequency": "2 hours"
 }
