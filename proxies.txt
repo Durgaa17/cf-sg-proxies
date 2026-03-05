@@ -1,6 +1,6 @@
 # Singapore & Malaysia Proxies
 # Source: FoolVPN-ID/Nautica
-# Updated: Wed Mar  4 14:37:18 UTC 2026
+# Updated: Thu Mar  5 02:05:26 UTC 2026
 
 # 🇸🇬 Singapore Proxies (SG)
 47.74.254.191 : 8900 : SG : Alibaba Cloud - SG
@@ -19,18 +19,19 @@
 45.76.183.217 : 49292 : SG : Vultr Holdings :  LLC
 194.36.178.36 : 8443 : SG : FIRST SERVER LIMITED
 91.192.81.154 : 2053 : SG : Melbikomas UAB
+51.79.158.58 : 8443 : SG : OVH Singapore PTE. LTD
 104.248.145.216 : 443 : SG : DigitalOcean :  LLC
 138.2.69.236 : 23334 : SG : Oracle Corporation
 146.235.19.79 : 28983 : SG : Oracle Corporation
 143.42.66.91 : 443 : SG : M1 LIMITED
 164.52.2.100 : 443 : SG : UCUL-SG
-164.52.2.99 : 443 : SG : UCUL-SG
-168.138.165.174 : 443 : SG : Oracle Public Cloud
-168.138.171.70 : 23280 : SG : Oracle Public Cloud
 164.52.2.98 : 443 : SG : UCUL-SG
+164.52.2.99 : 443 : SG : UCUL-SG
+168.138.171.70 : 23280 : SG : Oracle Public Cloud
+168.138.165.174 : 443 : SG : Oracle Public Cloud
 194.36.178.36 : 2053 : SG : FIRST SERVER LIMITED
-185.81.28.95 : 30503 : SG : AKILE LTD
 194.36.179.5 : 2053 : SG : FIRST SERVER LIMITED
+185.81.28.95 : 30503 : SG : AKILE LTD
 194.36.179.17 : 2053 : SG : FIRST SERVER LIMITED
 194.36.179.17 : 8443 : SG : FIRST SERVER LIMITED
 213.35.100.31 : 47112 : SG : Oracle Svenska AB
@@ -46,6 +47,6 @@
 38.60.193.247 : 13300 : MY : Kaopu Cloud HK Limited
 
 # 📊 Statistics
-# Singapore: 38
+# Singapore: 39
 # Malaysia: 1
-# Total: 39
+# Total: 40
