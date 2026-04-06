@@ -1,6 +1,6 @@
 # Singapore & Malaysia Proxies
 # Source: FoolVPN-ID/Nautica
-# Updated: Thu Apr  2 16:55:50 UTC 2026
+# Updated: Sun Apr  5 14:35:28 UTC 2026
 
 # 🇸🇬 Singapore Proxies (SG)
 47.74.254.191 : 8900 : SG : Alibaba Cloud - SG
@@ -19,9 +19,9 @@
 104.248.145.216 : 443 : SG : DigitalOcean :  LLC
 146.235.19.79 : 28983 : SG : Oracle Corporation
 164.52.2.100 : 443 : SG : UCUL-SG
-143.42.66.91 : 443 : SG : M1 LIMITED
-164.52.2.99 : 443 : SG : UCUL-SG
 164.52.2.98 : 443 : SG : UCUL-SG
+164.52.2.99 : 443 : SG : UCUL-SG
+143.42.66.91 : 443 : SG : M1 LIMITED
 168.138.171.70 : 23280 : SG : Oracle Public Cloud
 168.138.165.174 : 443 : SG : Oracle Public Cloud
 185.81.28.95 : 30503 : SG : AKILE LTD
