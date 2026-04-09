@@ -1,6 +1,6 @@
 # Singapore & Malaysia Proxies
 # Source: FoolVPN-ID/Nautica
-# Updated: Thu Apr  9 05:47:56 UTC 2026
+# Updated: Thu Apr  9 13:27:19 UTC 2026
 
 # 🇸🇬 Singapore Proxies (SG)
 47.74.254.191 : 8900 : SG : Alibaba Cloud - SG
