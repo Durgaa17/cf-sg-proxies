@@ -1,6 +1,6 @@
 # Singapore & Malaysia Proxies
 # Source: FoolVPN-ID/Nautica
-# Updated: Mon May 18 16:46:44 UTC 2026
+# Updated: Mon May 18 19:43:46 UTC 2026
 
 # 🇸🇬 Singapore Proxies (SG)
 47.74.254.191 : 8900 : SG : Alibaba Cloud - SG
@@ -19,14 +19,14 @@
 164.52.2.99 : 443 : SG : UCUL-SG
 168.138.171.70 : 23280 : SG : Oracle Public Cloud
 168.138.165.174 : 443 : SG : Oracle Public Cloud
-194.36.179.17 : 8443 : SG : FIRST SERVER :  SOCIEDAD LIMITADA
-3.1.116.161 : 8443 : SG : Amazon Data Services Singapore
-43.156.181.203 : 443 : SG : 16 COLLYER QUAY
-3.1.116.161 : 2053 : SG : Amazon Data Services Singapore
-43.156.116.194 : 443 : SG : 6 COLLYER QUAY
 194.36.179.17 : 2053 : SG : FIRST SERVER :  SOCIEDAD LIMITADA
-91.192.81.154 : 8443 : SG : Melbikomas UAB
+194.36.179.17 : 8443 : SG : FIRST SERVER :  SOCIEDAD LIMITADA
+3.1.116.161 : 2053 : SG : Amazon Data Services Singapore
+3.1.116.161 : 8443 : SG : Amazon Data Services Singapore
+43.156.116.194 : 443 : SG : 6 COLLYER QUAY
+43.156.181.203 : 443 : SG : 16 COLLYER QUAY
 5.34.176.119 : 81 : SG : Green Floid LLC
+91.192.81.154 : 8443 : SG : Melbikomas UAB
 13.250.131.37 : 443 : SG : Amazon Data Services Singapore
 
 # 🇲🇾 Malaysia Proxies (MY)
