@@ -1,6 +1,6 @@
 # Singapore & Malaysia Proxies
 # Source: FoolVPN-ID/Nautica
-# Updated: Sat May 30 22:56:41 UTC 2026
+# Updated: Sun May 31 03:51:33 UTC 2026
 
 # 🇸🇬 Singapore Proxies (SG)
 47.74.254.191 : 8900 : SG : Alibaba Cloud - SG
@@ -11,27 +11,30 @@
 129.150.36.188 : 53435 : SG : Oracle Corporation
 138.2.95.61 : 1111 : SG : Oracle Corporation
 45.76.183.217 : 49292 : SG : Vultr Holdings :  LLC
+91.192.81.154 : 2053 : SG : Melbikomas UAB
 104.248.145.216 : 443 : SG : DigitalOcean :  LLC
 146.235.19.79 : 28983 : SG : Oracle Corporation
-91.192.81.154 : 2053 : SG : Melbikomas UAB
-143.42.66.91 : 443 : SG : M1 LIMITED
 164.52.2.100 : 443 : SG : UCUL-SG
-164.52.2.99 : 443 : SG : UCUL-SG
 164.52.2.98 : 443 : SG : UCUL-SG
+164.52.2.99 : 443 : SG : UCUL-SG
 168.138.171.70 : 23280 : SG : Oracle Public Cloud
+168.138.165.174 : 443 : SG : Oracle Public Cloud
 194.36.179.17 : 2053 : SG : FIRST SERVER :  SOCIEDAD LIMITADA
 194.36.179.17 : 8443 : SG : FIRST SERVER :  SOCIEDAD LIMITADA
 213.35.100.31 : 47112 : SG : Oracle Svenska AB
+143.42.66.91 : 443 : SG : M1 LIMITED
 3.1.116.161 : 2053 : SG : Amazon Data Services Singapore
 3.1.116.161 : 8443 : SG : Amazon Data Services Singapore
 43.156.181.203 : 443 : SG : 16 COLLYER QUAY
-168.138.165.174 : 443 : SG : Oracle Public Cloud
+43.156.116.194 : 443 : SG : 6 COLLYER QUAY
 5.34.176.119 : 81 : SG : Green Floid LLC
+13.250.131.37 : 443 : SG : Amazon Data Services Singapore
+91.192.81.154 : 8443 : SG : Melbikomas UAB
 
 # 🇲🇾 Malaysia Proxies (MY)
 38.60.193.247 : 13300 : MY : Kaopu Cloud HK Limited
 
 # 📊 Statistics
-# Singapore: 24
+# Singapore: 27
 # Malaysia: 1
-# Total: 25
+# Total: 28
