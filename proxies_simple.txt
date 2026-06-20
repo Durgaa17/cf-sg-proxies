@@ -1,5 +1,5 @@
 # Simple Proxy List for API Validation
-# Updated: Sat Jun 20 03:39:11 UTC 2026
+# Updated: Sat Jun 20 07:49:40 UTC 2026
 
 47.74.254.191:8900
 146.235.18.248:45137
