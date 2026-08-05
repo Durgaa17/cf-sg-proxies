@@ -1,6 +1,6 @@
 # Singapore & Malaysia Proxies
 # Source: FoolVPN-ID/Nautica
-# Updated: Wed Aug  5 14:07:01 UTC 2026
+# Updated: Wed Aug  5 17:35:29 UTC 2026
 
 # 🇸🇬 Singapore Proxies (SG)
 146.235.18.248 : 45137 : SG : Oracle Corporation
