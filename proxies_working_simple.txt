@@ -1,5 +1,5 @@
 # Simple Working Proxies
-# Validated: Fri Aug 21 12:44:08 UTC 2026
+# Validated: Fri Aug 21 16:32:32 UTC 2026
 
 47.74.254.191:8900
 146.235.18.248:45137
