@@ -1,5 +1,5 @@
-# Simple Working Proxies
-# Validated: Thu Sep 17 23:55:13 UTC 2026
+# Simple Proxy List for API Validation
+# Updated: Sun Sep 20 23:51:51 UTC 2026
 
 47.74.254.191:8900
 146.235.18.248:45137
