@@ -1,22 +1,11 @@
 # 🟢 WORKING Proxies (API Validated)
 # API: cf-workers-checkproxyip.pages.dev
-# Validated: Fri Nov  6 09:14:16 UTC 2026
+# Validated: Fri Nov  6 17:11:32 UTC 2026
 
-47.74.254.191:8900 | 1138ms
-146.235.18.248:45137 | 1365ms
-138.2.74.219:28616 | 1036ms
-129.150.36.188:53435 | 1096ms
-143.42.66.91:443 | 1091ms
-164.52.2.100:443 | 1008ms
-164.52.2.98:443 | 997ms
-164.52.2.99:443 | 959ms
-43.156.181.203:443 | 932ms
-43.156.116.194:443 | 975ms
-5.34.176.119:81 | 1020ms
 
 # 📊 Statistics
 # Total Tested: 12
-# Working: 11
-# Dead: 1
-# Success Rate: 91%
-# Validated: Fri Nov  6 09:14:40 UTC 2026
+# Working: 0
+# Dead: 12
+# Success Rate: 0%
+# Validated: Fri Nov  6 17:11:36 UTC 2026
