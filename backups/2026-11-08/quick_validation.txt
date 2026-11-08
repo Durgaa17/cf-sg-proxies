@@ -1,0 +1,9 @@
+# Quick Validation Results
+# Validated: Sat Nov  7 23:26:35 UTC 2026
+
+❌ 47.74.254.191:8900 - DEAD
+❌ 146.235.18.248:45137 - DEAD
+❌ 138.2.74.219:28616 - DEAD
+❌ 129.150.36.188:53435 - DEAD
+
+Working: 0/4
