@@ -1,0 +1,3 @@
+# Simple Working Proxies
+# Validated: Sun Nov 15 22:30:27 UTC 2026
+
